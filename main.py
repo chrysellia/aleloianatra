@@ -20,45 +20,45 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class Message(BaseModel):
+    role: str # "user" ou "assistant"
+    content: str
+
 class ChatRequest(BaseModel):
-    message: str
+    history: list[Message] # Liste des messages précédents
     user_level: str
     lesson_id: str
 
 @app.post("/ai/chat")
 async def chat(data: ChatRequest):
-    # Récupération sécurisée du contenu de la leçon
+    # 1. Récupération du contexte de la leçon
     lesson = LESSONS_DB.get(data.lesson_id)
-    
-    if lesson:
-        context_text = f"Leçon : {lesson['title']}. Contenu : {lesson['content']}"
-    else:
-        context_text = "Contenu général sur l'éducation financière à Madagascar."
+    context_text = f"Leçon : {lesson['title']}. Contenu : {lesson['content']}" if lesson else "Général"
 
-    system_prompt = f"""
-    Tu es Alelo'IA, un coach expert basé sur la philosophie de Robert Kiyosaki (Père Riche, Père Pauvre).
-    Ton but est d'enseigner aux jeunes Malgaches comment sortir de la 'Rat Race'.
-    
-    Contexte de la leçon actuelle : {context_text}
-    Niveau de l'élève : {data.user_level}
-    
-    Règles :
-    1. Utilise des exemples locaux (Ariary, MVola, petites entreprises à Mada).
-    2. Explique bien la différence entre Actif et Passif.
-    3. Sois motivant mais réaliste sur les risques.
-    """
+    # 2. Construction des messages pour l'API
+    messages = [{
+        "role": "system", 
+        "content": f"""
+        Tu es Alelo'IA, un coach expert basé sur la philosophie de Robert Kiyosaki.
+        Contexte : {context_text}. Niveau : {data.user_level}.
+        Règles : Utilise des exemples malgaches (Ariary, MVola). 
+        Si la discussion est déjà lancée (présence d'historique), ne refais pas de salutations amicales, entre directement dans le vif du sujet.
+        """
+    }]
 
-    # Appel à l'IA Groq
-    completion = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": data.message}
-        ],
-        temperature=0.7 
-    )
+    # Ajout de l'historique des messages
+    for msg in data.history:
+        messages.append({"role": msg.role, "content": msg.content})
 
-    return {"response": completion.choices[0].message.content}
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=messages,
+            temperature=0.7 
+        )
+        return {"response": completion.choices[0].message.content}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 #Quiz
@@ -141,7 +141,6 @@ async def detect_scam(data: ScamRequest):
     
 @app.get("/ai/lessons")
 async def get_lessons():
-    # On renvoie la liste des leçons sans le contenu complet pour ne pas alourdir
     return [
         {"id": key, "title": val["title"]} 
         for key, val in LESSONS_DB.items()
