@@ -19,7 +19,7 @@ Ce service est le cerveau du projet Alelo'IA. Il utilise **FastAPI** et l'IA **G
    ```
 3. **Configuration (Important)** :
     * Crée un fichier .env à la racine.
-    * Ajoute ta clé API Groq : GROQ_API_KEY=votre_cle_ici
+    * Ajoute la clé API Groq : GROQ_API_KEY=votre_cle_ici
 
 4. **Lancer le serveur** :
     ```bash
