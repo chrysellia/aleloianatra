@@ -38,6 +38,7 @@ Une fois lancé, accède au Swagger ici : http://127.0.0.1:8000/docs
 Requête (Ce que le Front envoie) :
 ```bash
     {
+      "user_id": "user_test_01"
       "message": "C'est quoi l'épargne ?",
       "user_level": "débutant",
       "lesson_id": "L01"
