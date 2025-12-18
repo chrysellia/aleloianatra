@@ -33,7 +33,7 @@ Une fois lancé, accède au Swagger ici : http://127.0.0.1:8000/docs
 
 ## 📝 Exemples d'utilisation (Payloads)
 
-1. Chat avec le Coach (/ai/chat)
+1. Chat avec le Coach (POST /ai/chat)
 Requête (Ce que le Front envoie) :
 ```bash
     {
@@ -50,7 +50,7 @@ Réponse (Ce que le Front reçoit) :
     }   
 ```
 
-2. Générateur de Quiz (/ai/generate-quiz)
+2. Générateur de Quiz (POST /ai/generate-quiz)
 Requête :
 ```bash
     {
@@ -71,3 +71,22 @@ Réponse :
     ]
   }  
 ```
+
+3. Détecteur d'Arnaques (POST /ai/detect-scam)
+Requête :
+```bash
+    {
+      "message_content": "Félicitations ! Vous avez gagné 1.000.000 Ar..."
+    }  
+```
+Réponse :
+```bash
+    {
+      "verdict": "DANGEREUX",
+      "score": 9,
+      "analyse": "Explication du risque...",
+      "conseil": "Action à entreprendre..."
+    }  
+```
+
+4. Liste des Leçons (GET /ai/lessons)
