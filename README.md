@@ -37,16 +37,16 @@ Une fois lancé, accède au Swagger ici : http://127.0.0.1:8000/docs
 Requête (Ce que le Front envoie) :
 ```bash
     {
-  "message": "C'est quoi l'épargne ?",
-  "user_level": "débutant",
-  "lesson_id": "L01"
+      "message": "C'est quoi l'épargne ?",
+      "user_level": "débutant",
+      "lesson_id": "L01"
     }   
 ```
 
 Réponse (Ce que le Front reçoit) :
 ```bash
     {
-  "response": "L'épargne, c'est mettre un peu d'argent de côté aujourd'hui (comme sur ton compte MVola) pour pouvoir réaliser un projet plus tard ou faire face à une urgence."
+      "response": "L'épargne, c'est mettre un peu d'argent de côté aujourd'hui (comme sur ton compte MVola) pour pouvoir réaliser un projet plus tard ou faire face à une urgence."
     }   
 ```
 
@@ -54,8 +54,8 @@ Réponse (Ce que le Front reçoit) :
 Requête :
 ```bash
     {
-  "lesson_content": "Le code PIN Mobile Money doit rester secret.",
-  "num_questions": 1
+      "lesson_content": "Le code PIN Mobile Money doit rester secret.",
+      "num_questions": 1
     }  
 ```
 Réponse :
