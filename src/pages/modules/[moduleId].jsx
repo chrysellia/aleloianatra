@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom'
-<<<<<<< HEAD
 import coursesData from '../../data/courses.json'
-=======
->>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
 import {
   Box,
   Container,
@@ -45,7 +42,6 @@ export default function ModuleDetail() {
   const [loading, setLoading] = useState(true)
   const [progress, setProgress] = useState(0)
 
-<<<<<<< HEAD
   // Charger les données du module
   useEffect(() => {
     const fetchModuleData = async () => {
@@ -188,63 +184,6 @@ export default function ModuleDetail() {
     if (lesson.locked) return;
     // Naviguer vers la leçon avec l'ID du module et l'ID de la leçon
     navigate(`/modules/${moduleId}/lessons/${lesson.id}`);
-=======
-  // Simuler le chargement des données
-  useEffect(() => {
-    // Ici, vous feriez normalement un appel API
-    const fetchModuleData = () => {
-      // Données de démonstration
-      // Après (corrigé)
-const mockModules = {
-  medias: {
-    id: 'medias',
-    title: 'Médias et Information',
-    description: 'Apprenez à analyser et évaluer les informations des médias de manière critique.',
-    category: 'Éducation aux médias',
-    difficulty: 'Intermédiaire',
-    duration: '4h 30min',
-    totalLessons: 8,  // Renommé de 'lessons' à 'totalLessons'
-    progress: 45,
-    instructor: {
-      name: 'Dr. Marie Rakoto',
-      role: 'Professeure en Sciences de l\'Information',
-      avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-    },
-    objectives: [
-      'Comprendre le paysage médiatique actuel',
-      'Identifier les sources fiables',
-      'Détecter les fausses informations',
-      'Développer un esprit critique face aux médias'
-    ],
-    lessons: [  // Seule déclaration de 'lessons'
-      { id: 1, title: 'Introduction aux médias', duration: '25 min', completed: true, locked: false },
-      { id: 2, title: 'Les différents types de médias', duration: '35 min', completed: true, locked: false },
-      { id: 3, title: 'Comment évaluer une source', duration: '40 min', completed: true, locked: false },
-      { id: 4, title: 'Les biais médiatiques', duration: '30 min', completed: false, locked: false },
-      { id: 5, title: 'Les fake news et comment les repérer', duration: '45 min', completed: false, locked: true },
-      { id: 6, title: 'Les réseaux sociaux et l\'information', duration: '35 min', completed: false, locked: true },
-      { id: 7, title: 'Atelier pratique', duration: '1h', completed: false, locked: true },
-      { id: 8, title: 'Évaluation finale', duration: '20 min', completed: false, locked: true },
-    ]
-  }
-}
-
-      setTimeout(() => {
-        const data = mockModules[moduleId] || null
-        setModuleData(data)
-        setProgress(data?.progress || 0)
-        setLoading(false)
-      }, 500)
-    }
-
-    fetchModuleData()
-  }, [moduleId])
-
-  const handleLessonClick = (lesson) => {
-    if (lesson.locked) return
-    // Naviguer vers la leçon
-    navigate(`/modules/${moduleId}/lessons/${lesson.id}`)
->>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
   }
 
   const handleStartModule = () => {
@@ -263,14 +202,10 @@ const mockModules = {
   if (loading) {
     return (
       <Container maxW="7xl" py={8}>
-<<<<<<< HEAD
         <Text>Chargement du module {moduleId}...</Text>
         <Text fontSize="sm" color="gray.500" mt={2}>
           Veuillez patienter pendant le chargement des données du module.
         </Text>
-=======
-        <Text>Chargement du module...</Text>
->>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
       </Container>
     )
   }
@@ -278,7 +213,6 @@ const mockModules = {
   if (!moduleData) {
     return (
       <Container maxW="7xl" py={8} textAlign="center">
-<<<<<<< HEAD
         <Heading size="lg" mb={4}>Module non chargé</Heading>
         <Text mb={4}>Impossible de charger les données du module {moduleId}.</Text>
         <Text mb={6} color="red.500" fontSize="sm">
@@ -293,23 +227,13 @@ const mockModules = {
             Module ID: {moduleId}
           </Text>
         </Box>
-=======
-        <Heading size="lg" mb={4}>Module non trouvé</Heading>
-        <Text mb={6}>Le module que vous recherchez n'existe pas ou a été déplacé.</Text>
-        <Button as={RouterLink} to="/modules" colorScheme="primary">
-          Retour aux modules
-        </Button>
->>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
       </Container>
     )
   }
 
-<<<<<<< HEAD
   // Debug: Afficher le contenu de moduleData.lessons
   console.log('Liste des leçons chargées:', moduleData.lessons);
   
-=======
->>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
   const nextLesson = moduleData.lessons.find(lesson => !lesson.completed && !lesson.locked)
   const completedLessons = moduleData.lessons.filter(lesson => lesson.completed).length
 
@@ -393,13 +317,9 @@ const mockModules = {
           <TabPanels mt={6}>
             <TabPanel px={0}>
               <VStack spacing={4} align="stretch">
-<<<<<<< HEAD
                 {console.log('Rendu des leçons:', moduleData.lessons)}
                 {moduleData.lessons && moduleData.lessons.length > 0 ? (
                   moduleData.lessons.map((lesson, index) => (
-=======
-                {moduleData.lessons.map((lesson, index) => (
->>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
                   <Card 
                     key={lesson.id} 
                     variant="outline" 
@@ -452,7 +372,6 @@ const mockModules = {
                       </HStack>
                     </CardBody>
                   </Card>
-<<<<<<< HEAD
                 ))
                 ) : (
                   <Box p={4} bg="yellow.50" borderRadius="md" borderLeft="4px" borderColor="yellow.400">
@@ -462,9 +381,6 @@ const mockModules = {
                     </Text>
                   </Box>
                 )}
-=======
-                ))}
->>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
               </VStack>
             </TabPanel>
             

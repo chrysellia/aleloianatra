@@ -9,7 +9,6 @@ import {
 } from '@chakra-ui/react';
 import { FaArrowLeft, FaCheck, FaClock, FaArrowRight, FaTrophy, FaLock, FaBook } from 'react-icons/fa';
 
-//Débutde la fonction leçon - Test
 const Lesson = () => {
   const { moduleId, lessonId } = useParams();
   const navigate = useNavigate();
