@@ -21,9 +21,10 @@ import ProtectedRoute from './components/ProtectedRoute'
 function Layout({ children }) {
   const location = useLocation()
   const isDashboard = location.pathname === '/dashboard'
+  const isModules = location.pathname === '/modules' || location.pathname.startsWith('/modules/')
   const isCourseComplete = location.pathname.startsWith('/course-complete')
 
-  if (isDashboard || isCourseComplete) {
+  if (isDashboard || isModules || isCourseComplete) {
     return <>{children}</>
   }
 
