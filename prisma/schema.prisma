@@ -1,0 +1,261 @@
+// Prisma Schema pour Alelo'IA-NATRA
+// Plateforme d'éducation à la littératie médiatique
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ UTILISATEURS ============
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  passwordHash      String
+  name              String
+  role              UserRole  @default(USER)
+  audience          Audience  @default(GENERAL)
+  xpTotal           Int       @default(0)
+  dailyStreak       Int       @default(0)
+  profileCompletion Int       @default(0)
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  progress       UserProgress[]
+  quizAttempts   QuizAttempt[]
+  achievements   UserAchievement[]
+  analyses       Analysis[]
+  communityPosts CommunityPost[]
+  comments       Comment[]
+  likes          PostLike[]
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum Audience {
+  STUDENTS
+  DEVELOPERS
+  DESIGNERS
+  DATA_SCIENTISTS
+  GENERAL
+}
+
+// ============ MODULES ============
+model Module {
+  id               String     @id @default(uuid())
+  title            String
+  description      String
+  level            Level
+  audiences        Audience[]
+  estimatedMinutes Int
+  orderIndex       Int        @default(0)
+  isPublished      Boolean    @default(true)
+  imageUrl         String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  // Relations
+  lessons  Lesson[]
+  quizzes  Quiz[]
+  progress UserProgress[]
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  PRACTICAL
+}
+
+// ============ LEÇONS ============
+model Lesson {
+  id         String   @id @default(uuid())
+  moduleId   String
+  title      String
+  summary    String
+  content    String   @db.Text
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  module   Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
+}
+
+// ============ QUIZ ============
+model Quiz {
+  id           String     @id @default(uuid())
+  moduleId     String
+  question     String
+  choices      String[]
+  correctIndex Int
+  rationale    String
+  difficulty   Difficulty
+  tags         String[]
+  audiences    Audience[]
+  orderIndex   Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  module   Module        @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  attempts QuizAttempt[]
+}
+
+enum Difficulty {
+  EASY
+  INTERMEDIATE
+  ADVANCED
+}
+
+model QuizAttempt {
+  id            String   @id @default(uuid())
+  userId        String
+  quizId        String
+  selectedIndex Int
+  isCorrect     Boolean
+  xpEarned      Int      @default(0)
+  timeSpent     Int      @default(0) // en secondes
+  createdAt     DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+// ============ PROGRESSION ============
+model UserProgress {
+  id              String    @id @default(uuid())
+  userId          String
+  moduleId        String
+  progressPercent Int       @default(0)
+  completedAt     DateTime?
+  lastAccessedAt  DateTime  @default(now())
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+}
+
+model LessonProgress {
+  id          String    @id @default(uuid())
+  lessonId    String
+  userId      String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  timeSpent   Int       @default(0) // en secondes
+
+  // Relations
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonId, userId])
+}
+
+// ============ RÉALISATIONS ============
+model Achievement {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+  icon        String
+  color       String
+  xpReward    Int    @default(0)
+  condition   Json   // Condition pour obtenir (ex: {"type": "modules_completed", "count": 3})
+
+  // Relations
+  users UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid())
+  userId        String
+  achievementId String
+  count         Int      @default(1)
+  earnedAt      DateTime @default(now())
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+}
+
+// ============ ANALYSE IA ============
+model Analysis {
+  id          String   @id @default(uuid())
+  userId      String?
+  inputText   String   @db.Text
+  result      Json     // Résultat complet de l'analyse
+  biasScore   Float?   // Score de biais (0-1)
+  reliability Float?   // Score de fiabilité (0-1)
+  suggestions String[]
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// ============ COMMUNAUTÉ ============
+model CommunityPost {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  content   String   @db.Text
+  tags      String[]
+  likesCount Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    PostLike[]
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+// ============ CERTIFICATIONS ============
+model Certification {
+  id           String @id @default(uuid())
+  title        String
+  description  String
+  requirements Json   // Conditions pour obtenir
+  icon         String
+  isActive     Boolean @default(true)
+}
+
