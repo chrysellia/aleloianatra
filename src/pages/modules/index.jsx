@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+import React, { useState, useEffect } from 'react'
+=======
 import React from 'react'
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
 import { useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -17,15 +21,66 @@ import {
   InputLeftElement,
   Input,
   Select,
+<<<<<<< HEAD
+  Card,
+  CardBody,
+} from '@chakra-ui/react'
+import { SearchIcon } from '@chakra-ui/icons'
+import { 
+  FaBook,
+  FaArrowRight,
+  FaRegClock
+} from 'react-icons/fa'
+import coursesData from '../../data/courses.json'
+=======
 } from '@chakra-ui/react'
 import { SearchIcon } from '@chakra-ui/icons'
 import { FaGlobeAfrica, FaNewspaper, FaBrain, FaShieldAlt, FaUsers } from 'react-icons/fa'
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
 
 export default function Modules() {
   const navigate = useNavigate()
   const cardBg = useColorModeValue('white', 'gray.700')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
   const hoverBg = useColorModeValue('gray.50', 'gray.600')
+<<<<<<< HEAD
+  const [courses, setCourses] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterLevel, setFilterLevel] = useState('all')
+
+  const difficultyLevels = [
+    { value: 'all', label: 'Tous les niveaux' },
+    { value: 'Débutant', label: 'Débutant' },
+    { value: 'Intermédiaire', label: 'Intermédiaire' },
+    { value: 'Avancé', label: 'Avancé' },
+    { value: 'Pratique', label: 'Pratique' },
+  ]
+
+  useEffect(() => {
+    // Charger les cours depuis courses.json
+    setCourses(coursesData)
+  }, [])
+
+  const getLevelColor = (level) => {
+    const levelColors = {
+      'Débutant': 'green',
+      'Intermédiaire': 'blue',
+      'Avancé': 'purple',
+      'Pratique': 'orange'
+    }
+    return levelColors[level] || 'gray'
+  }
+
+  const filteredCourses = courses.filter(course => {
+    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         course.description.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesLevel = filterLevel === 'all' || course.level === filterLevel
+    return matchesSearch && matchesLevel
+  })
+
+  const handleCourseClick = (courseId) => {
+    navigate(`/modules/${courseId}`)
+=======
 
   const categories = [
     {
@@ -79,6 +134,7 @@ export default function Modules() {
 
   const handleCategoryClick = (categoryId) => {
     navigate(`/modules/${categoryId}`)
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
   }
 
   return (
@@ -86,10 +142,17 @@ export default function Modules() {
       <VStack spacing={8} align="stretch">
         <Box>
           <Heading as="h1" size="xl" mb={2}>
+<<<<<<< HEAD
+            Modules d'Apprentissage
+          </Heading>
+          <Text color={useColorModeValue('gray.600', 'gray.400')}>
+            Découvrez nos cours et développez vos compétences
+=======
             Parcours d'apprentissage
           </Heading>
           <Text color={useColorModeValue('gray.600', 'gray.400')}>
             Découvrez nos modules de formation pour renforcer votre esprit critique et votre analyse des médias
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
           </Text>
         </Box>
 
@@ -108,8 +171,15 @@ export default function Modules() {
                 <SearchIcon color="gray.400" />
               </InputLeftElement>
               <Input
+<<<<<<< HEAD
+                placeholder="Rechercher un cours..."
+                size="lg"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+=======
                 placeholder="Rechercher un module..."
                 size="lg"
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
                 _focus={{
                   borderColor: 'primary.500',
                   boxShadow: '0 0 0 1px var(--chakra-colors-primary-500)',
@@ -120,6 +190,11 @@ export default function Modules() {
             <Select
               placeholder="Filtrer par niveau"
               size="lg"
+<<<<<<< HEAD
+              value={filterLevel}
+              onChange={(e) => setFilterLevel(e.target.value)}
+=======
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
               _focus={{
                 borderColor: 'primary.500',
                 boxShadow: '0 0 0 1px var(--chakra-colors-primary-500)',
@@ -134,6 +209,99 @@ export default function Modules() {
           </SimpleGrid>
         </Box>
 
+<<<<<<< HEAD
+        {/* Liste des cours */}
+        {filteredCourses.length === 0 ? (
+          <Box p={8} textAlign="center" bg={cardBg} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+            <Text fontSize="lg" color={useColorModeValue('gray.600', 'gray.400')}>
+              Aucun cours trouvé avec ces critères de recherche.
+            </Text>
+          </Box>
+        ) : (
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+            {filteredCourses.map((course) => (
+              <Card
+                key={course.id}
+                bg={cardBg}
+                borderWidth="1px"
+                borderColor={borderColor}
+                _hover={{
+                  transform: 'translateY(-4px)',
+                  boxShadow: 'lg',
+                  borderColor: `${getLevelColor(course.level)}.400`,
+                }}
+                transition="all 0.2s"
+                cursor="pointer"
+                onClick={() => handleCourseClick(course.id)}
+                h="100%"
+              >
+                <CardBody>
+                  <VStack align="stretch" spacing={4} h="100%">
+                    <HStack justify="space-between" align="start">
+                      <Box flex={1}>
+                        <HStack mb={2}>
+                          <Icon as={FaBook} color={`${getLevelColor(course.level)}.500`} />
+                          <Badge colorScheme={getLevelColor(course.level)} variant="subtle">
+                            {course.level}
+                          </Badge>
+                        </HStack>
+                        <Heading size="md" mb={2}>
+                          {course.title}
+                        </Heading>
+                        <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')} noOfLines={3}>
+                          {course.description}
+                        </Text>
+                      </Box>
+                    </HStack>
+                    
+                    <Box>
+                      <HStack spacing={4} mb={3} fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
+                        <HStack>
+                          <Icon as={FaBook} />
+                          <Text>{course.lessons?.length || 0} leçons</Text>
+                        </HStack>
+                        <HStack>
+                          <Icon as={FaRegClock} />
+                          <Text>{course.estimatedMinutes || 0} min</Text>
+                        </HStack>
+                      </HStack>
+                      
+                      {course.lessons && course.lessons.length > 0 && (
+                        <VStack align="stretch" spacing={1} mb={4}>
+                          <Text fontSize="xs" fontWeight="medium" color={useColorModeValue('gray.700', 'gray.300')}>
+                            Leçons :
+                          </Text>
+                          {course.lessons.slice(0, 2).map((lesson, idx) => (
+                            <Text key={idx} fontSize="xs" color={useColorModeValue('gray.600', 'gray.400')}>
+                              • {lesson.title}
+                            </Text>
+                          ))}
+                          {course.lessons.length > 2 && (
+                            <Text fontSize="xs" color={useColorModeValue('gray.500', 'gray.500')}>
+                              + {course.lessons.length - 2} autres leçons...
+                            </Text>
+                          )}
+                        </VStack>
+                      )}
+                    </Box>
+                    
+                    <Button
+                      colorScheme={getLevelColor(course.level)}
+                      variant="solid"
+                      size="sm"
+                      width="full"
+                      mt="auto"
+                      rightIcon={<FaArrowRight />}
+                    >
+                      Voir les leçons
+                    </Button>
+                  </VStack>
+                </CardBody>
+              </Card>
+            ))}
+          </SimpleGrid>
+        )}
+=======
         {/* Liste des catégories */}
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
           {categories.map((category) => (
@@ -206,6 +374,7 @@ export default function Modules() {
             </Box>
           ))}
         </SimpleGrid>
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
 
         {/* Appel à l'action */}
         <Box

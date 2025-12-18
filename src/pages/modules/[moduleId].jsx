@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom'
+<<<<<<< HEAD
+import coursesData from '../../data/courses.json'
+=======
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
 import {
   Box,
   Container,
@@ -41,6 +45,150 @@ export default function ModuleDetail() {
   const [loading, setLoading] = useState(true)
   const [progress, setProgress] = useState(0)
 
+<<<<<<< HEAD
+  // Charger les données du module
+  useEffect(() => {
+    const fetchModuleData = async () => {
+      try {
+        setLoading(true);
+        
+        // Vérifier d'abord si c'est le module rich-dad-poor-dad (gestion spéciale)
+        if (moduleId === 'rich-dad-poor-dad') {
+          try {
+            const module = await import('../../data/modules/rich-dad-poor-dad');
+            const moduleData = module.richDadPoorDadModule;
+            
+            if (!moduleData.content || !Array.isArray(moduleData.content)) {
+              throw new Error('Format de données invalide pour le module');
+            }
+            
+            const lessons = moduleData.content
+              .filter(item => item && (item.type === 'text' || item.type === 'lesson') && item.id && item.title)
+              .map((lesson, index) => ({
+                id: lesson.id,
+                title: lesson.title,
+                duration: '15 min',
+                completed: false,
+                locked: index > 0,
+                content: lesson.content || 'Contenu de la leçon non disponible.'
+              }));
+            
+            const formattedData = {
+              id: moduleData.id || 'rich-dad-poor-dad',
+              title: moduleData.title || 'Père Riche, Père Pauvre',
+              description: moduleData.description || 'Découvrez les principes de la liberté financière',
+              category: moduleData.category || 'Éducation financière',
+              difficulty: moduleData.level || 'Débutant',
+              duration: moduleData.duration || '2h',
+              totalLessons: lessons.length,
+              progress: 0,
+              instructor: {
+                name: 'Robert Kiyosaki',
+                role: 'Auteur et entrepreneur',
+                avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+              },
+              objectives: [
+                'Comprendre les principes de base de la richesse',
+                'Apprendre à faire travailler l\'argent pour soi',
+                'Développer un état d\'esprit d\'investisseur'
+              ],
+              lessons: lessons
+            };
+            
+            setModuleData(formattedData);
+            setProgress(0);
+            setLoading(false);
+            return;
+          } catch (error) {
+            console.error('Erreur lors du chargement du module rich-dad-poor-dad:', error);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        // Charger depuis courses.json
+        const course = coursesData.find(c => c.id === moduleId);
+        
+        if (!course) {
+          console.warn('Cours non trouvé:', moduleId);
+          setModuleData(null);
+          setLoading(false);
+          return;
+        }
+        
+        // Formater les leçons depuis courses.json
+        const lessons = (course.lessons || []).map((lesson, index) => {
+          // Récupérer les leçons complétées depuis le stockage local
+          const savedCompleted = JSON.parse(localStorage.getItem(`completedLessons_${moduleId}`) || '[]');
+          const isCompleted = savedCompleted.includes(lesson.id);
+          
+          return {
+            id: lesson.id,
+            title: lesson.title,
+            duration: `${Math.ceil((course.estimatedMinutes || 0) / (course.lessons?.length || 1))} min`,
+            completed: isCompleted,
+            locked: false, // Toutes les leçons sont déverrouillées par défaut
+            summary: lesson.summary || ''
+          };
+        });
+        
+        // Calculer la progression
+        const savedCompleted = JSON.parse(localStorage.getItem(`completedLessons_${moduleId}`) || '[]');
+        const completedCount = lessons.filter(l => savedCompleted.includes(l.id)).length;
+        const calculatedProgress = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0;
+        
+        // Déterminer la catégorie selon le cours
+        const getCategory = (courseId) => {
+          const categories = {
+            'budget-personnel': 'Gestion personnelle',
+            'credit-dette': 'Gestion du crédit',
+            'epargne': 'Épargne et investissement',
+            'finance-entrepreneurs': 'Finance d\'entreprise',
+            'finance-digitale': 'Finance numérique',
+            'finance-agricole': 'Finance rurale'
+          };
+          return categories[courseId] || 'Éducation financière';
+        };
+        
+        const formattedData = {
+          id: course.id,
+          title: course.title,
+          description: course.description,
+          category: getCategory(course.id),
+          difficulty: course.level,
+          duration: `${course.estimatedMinutes || 0} min`,
+          totalLessons: lessons.length,
+          progress: calculatedProgress,
+          instructor: {
+            name: 'Expert en éducation financière',
+            role: 'Formateur certifié',
+            avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+          },
+          objectives: [
+            'Comprendre les concepts fondamentaux',
+            'Développer des compétences pratiques',
+            'Appliquer les connaissances acquises'
+          ],
+          lessons: lessons
+        };
+        
+        setModuleData(formattedData);
+        setProgress(calculatedProgress);
+        setLoading(false);
+      } catch (error) {
+        console.error('Erreur lors du chargement du module:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchModuleData();
+  }, [moduleId]);
+
+  const handleLessonClick = (lesson) => {
+    if (lesson.locked) return;
+    // Naviguer vers la leçon avec l'ID du module et l'ID de la leçon
+    navigate(`/modules/${moduleId}/lessons/${lesson.id}`);
+=======
   // Simuler le chargement des données
   useEffect(() => {
     // Ici, vous feriez normalement un appel API
@@ -96,6 +244,7 @@ const mockModules = {
     if (lesson.locked) return
     // Naviguer vers la leçon
     navigate(`/modules/${moduleId}/lessons/${lesson.id}`)
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
   }
 
   const handleStartModule = () => {
@@ -114,7 +263,14 @@ const mockModules = {
   if (loading) {
     return (
       <Container maxW="7xl" py={8}>
+<<<<<<< HEAD
+        <Text>Chargement du module {moduleId}...</Text>
+        <Text fontSize="sm" color="gray.500" mt={2}>
+          Veuillez patienter pendant le chargement des données du module.
+        </Text>
+=======
         <Text>Chargement du module...</Text>
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
       </Container>
     )
   }
@@ -122,15 +278,38 @@ const mockModules = {
   if (!moduleData) {
     return (
       <Container maxW="7xl" py={8} textAlign="center">
+<<<<<<< HEAD
+        <Heading size="lg" mb={4}>Module non chargé</Heading>
+        <Text mb={4}>Impossible de charger les données du module {moduleId}.</Text>
+        <Text mb={6} color="red.500" fontSize="sm">
+          Vérifiez la console pour plus de détails sur l'erreur.
+        </Text>
+        <Button as={RouterLink} to="/modules" colorScheme="primary" mb={4}>
+          Retour aux modules
+        </Button>
+        <Box mt={4} p={4} bg="gray.100" borderRadius="md" textAlign="left">
+          <Text fontWeight="bold" mb={2}>Détails techniques :</Text>
+          <Text fontSize="sm" fontFamily="mono">
+            Module ID: {moduleId}
+          </Text>
+        </Box>
+=======
         <Heading size="lg" mb={4}>Module non trouvé</Heading>
         <Text mb={6}>Le module que vous recherchez n'existe pas ou a été déplacé.</Text>
         <Button as={RouterLink} to="/modules" colorScheme="primary">
           Retour aux modules
         </Button>
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
       </Container>
     )
   }
 
+<<<<<<< HEAD
+  // Debug: Afficher le contenu de moduleData.lessons
+  console.log('Liste des leçons chargées:', moduleData.lessons);
+  
+=======
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
   const nextLesson = moduleData.lessons.find(lesson => !lesson.completed && !lesson.locked)
   const completedLessons = moduleData.lessons.filter(lesson => lesson.completed).length
 
@@ -214,7 +393,13 @@ const mockModules = {
           <TabPanels mt={6}>
             <TabPanel px={0}>
               <VStack spacing={4} align="stretch">
+<<<<<<< HEAD
+                {console.log('Rendu des leçons:', moduleData.lessons)}
+                {moduleData.lessons && moduleData.lessons.length > 0 ? (
+                  moduleData.lessons.map((lesson, index) => (
+=======
                 {moduleData.lessons.map((lesson, index) => (
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
                   <Card 
                     key={lesson.id} 
                     variant="outline" 
@@ -267,7 +452,19 @@ const mockModules = {
                       </HStack>
                     </CardBody>
                   </Card>
+<<<<<<< HEAD
+                ))
+                ) : (
+                  <Box p={4} bg="yellow.50" borderRadius="md" borderLeft="4px" borderColor="yellow.400">
+                    <Text>Aucune leçon disponible pour le moment.</Text>
+                    <Text fontSize="sm" color="gray.600" mt={2}>
+                      Veuillez vérifier que le module contient bien des leçons.
+                    </Text>
+                  </Box>
+                )}
+=======
                 ))}
+>>>>>>> 53fa89dd23aad9ac4f4ad818d1ad296ecbca1712
               </VStack>
             </TabPanel>
             
