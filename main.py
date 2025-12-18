@@ -115,7 +115,59 @@ async def get_history(user_id: str, lesson_id: str, db: Session = Depends(get_db
     ).order_by(AIChatHistory.timestamp.asc()).all()
     return history
 
+#Quiz Generation
+class QuizByIDRequest(BaseModel):
+    lesson_id: str
+    num_questions: int = 3
+    user_level: str = "débutant"
+
+@app.post("/ai/generate-quiz")
+async def generate_quiz(data: QuizByIDRequest):
+    lesson = LESSONS_DB.get(data.lesson_id)
     
+    if not lesson:
+        return {"error": "Leçon non trouvée."}
+
+
+    prompt = f"""
+    Basé sur ce contenu : "{lesson['content']}", 
+    génère un quiz de EXACTEMENT {data.num_questions} questions pour un niveau {data.user_level}.
+    
+    CONSIGNES STRICTES :
+    1. Difficulté : Adapte les questions au niveau "{data.user_level}".
+    2. Langue et contexte : Utilise des termes simples et des exemples malgaches (Ariary, Mvola).
+    3. Format : Génère exactement {data.num_questions} questions au format JSON.
+    4. La clé "answer" doit correspondre à une lettre (A, B ou C).
+    5. Retourne un objet JSON contenant une clé "questions" qui est une liste.
+    """
+    
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "Tu es un générateur de quiz. Réponds UNIQUEMENT en JSON."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={ "type": "json_object" } 
+        )
+        
+        import json
+        quiz_data = json.loads(completion.choices[0].message.content)
+        
+        # Pour éviter les structures bizarres, on s'assure de renvoyer une liste propre
+        # Si l'IA a mis les questions dans une clé "questions", on la récupère
+        final_questions = quiz_data.get("questions", quiz_data)
+        
+        return {
+            "lesson_title": lesson['title'],
+            "count_requested": data.num_questions,
+            "quiz": final_questions
+        }
+        
+    except Exception as e:
+        return {"error": f"Erreur : {str(e)}"}
+        
+
 #Scam Detection
 class ScamRequest(BaseModel):
     message_content: str

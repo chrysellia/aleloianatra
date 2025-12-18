@@ -58,7 +58,8 @@ Requête :
 ```bash
     {
       "lesson_content": "Le code PIN Mobile Money doit rester secret.",
-      "num_questions": 1
+      "num_questions": 1,
+      "user_level": "débutant" #Valeur par défaut 'débutant'
     }  
 ```
 Réponse :
