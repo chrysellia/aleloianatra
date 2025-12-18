@@ -5,3 +5,5 @@ langchain
 pydantic
 groq
 python-dotenv
+sqlalchemy
+psycopg2-binary
