@@ -60,14 +60,14 @@ Requête :
 ```
 Réponse :
 ```bash
-    {
-  "quiz": [
-    {
-      "question": "À qui pouvez-vous donner votre code PIN ?",
-      "options": ["À personne", "À un agent", "À un ami"],
-      "answer": "A",
-      "explanation": "Le code PIN est strictement personnel pour garantir la sécurité de votre argent."
-    }
-  ]
-}  
+  {
+    "quiz": [
+      {
+        "question": "À qui pouvez-vous donner votre code PIN ?",
+        "options": ["À personne", "À un agent", "À un ami"],
+        "answer": "A",
+        "explanation": "Le code PIN est strictement personnel pour garantir la sécurité de votre argent."
+      }
+    ]
+  }  
 ```
