@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
 from dotenv import load_dotenv
@@ -10,6 +11,14 @@ load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class ChatRequest(BaseModel):
     message: str
@@ -100,3 +109,40 @@ async def generate_quiz(data: QuizByIDRequest):
         
     except Exception as e:
         return {"error": f"Erreur : {str(e)}"}
+
+
+#Scam Detection
+class ScamRequest(BaseModel):
+    message_content: str
+
+@app.post("/ai/detect-scam")
+async def detect_scam(data: ScamRequest):
+    prompt = f"""
+    Analyse ce message suspect reçu par un utilisateur : "{data.message_content}"
+    
+    En tant qu'expert en sécurité financière à Madagascar, détermine s'il s'agit d'une arnaque.
+    Réponds au format JSON avec ces clés :
+    - "verdict": (SÛR, SUSPECT, ou DANGEREUX)
+    - "score": une note de danger de 0 à 10
+    - "analyse": explication courte du pourquoi (ex: demande de code PIN, promesse de gain irréaliste)
+    - "conseil": action à faire (ex: bloquer le numéro, ne jamais donner son PIN)
+    """
+
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+            response_format={ "type": "json_object" }
+        )
+        import json
+        return json.loads(completion.choices[0].message.content)
+    except Exception as e:
+        return {"error": str(e)}
+    
+@app.get("/ai/lessons")
+async def get_lessons():
+    # On renvoie la liste des leçons sans le contenu complet pour ne pas alourdir
+    return [
+        {"id": key, "title": val["title"]} 
+        for key, val in LESSONS_DB.items()
+    ]
