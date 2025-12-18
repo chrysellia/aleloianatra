@@ -38,3 +38,39 @@ async def chat(data: ChatRequest):
 
     return {"response": completion.choices[0].message.content}
 
+
+#Quiz
+class QuizRequest(BaseModel):
+    lesson_content: str
+    num_questions: int = 3
+
+@app.post("/ai/generate-quiz")
+async def generate_quiz(data: QuizRequest):
+    # On précise bien le format attendu pour que l'IA ne se trompe pas
+    prompt = f"""
+    Tu es un assistant pédagogique. Basé sur le contenu suivant : "{data.lesson_content}", 
+    génère un quiz de {data.num_questions} questions au format JSON.
+    
+    Chaque objet du tableau doit avoir exactement ces clés :
+    "question", "options" (un tableau de 3 choix), "answer" (la lettre correspondante), "explanation".
+    
+    Adapte les exemples au contexte de Madagascar.
+    """
+    
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "Tu réponds uniquement en JSON."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={ "type": "json_object" } 
+        )
+        
+        # On transforme la chaîne de caractères reçue en vrai objet JSON pour FastAPI
+        import json
+        quiz_data = json.loads(completion.choices[0].message.content)
+        return {"quiz": quiz_data}
+        
+    except Exception as e:
+        return {"error": str(e)}
