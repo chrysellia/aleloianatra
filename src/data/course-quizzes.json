@@ -1,0 +1,363 @@
+{
+  "budget-personnel": [
+    {
+      "id": "budget-q1",
+      "question": "Quel est le pourcentage recommandé d'épargne pour les urgences selon les bases de la budgétisation ?",
+      "options": [
+        "5% des revenus",
+        "10% des revenus",
+        "20% des revenus",
+        "30% des revenus"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Il est recommandé d'épargner au moins 10% de ses revenus pour faire face aux urgences et imprévus."
+    },
+    {
+      "id": "budget-q2",
+      "question": "Quelle est la première étape pour créer un budget mensuel ?",
+      "options": [
+        "Estimer les dépenses variables",
+        "Lister tous les revenus",
+        "Calculer les dépenses fixes",
+        "Définir les objectifs d'épargne"
+      ],
+      "correctAnswer": 1,
+      "explanation": "La première étape est de lister tous vos revenus pour avoir une vision claire de ce que vous gagnez."
+    },
+    {
+      "id": "budget-q3",
+      "question": "Quelle méthode est la plus efficace pour rembourser plusieurs dettes ?",
+      "options": [
+        "Rembourser la plus grande dette en premier",
+        "Rembourser la dette avec le taux d'intérêt le plus élevé en premier",
+        "Rembourser toutes les dettes en même temps",
+        "Attendre que les dettes disparaissent"
+      ],
+      "correctAnswer": 1,
+      "explanation": "La méthode recommandée est de rembourser d'abord la dette avec le taux d'intérêt le plus élevé pour réduire le coût total."
+    },
+    {
+      "id": "budget-q4",
+      "question": "Qu'est-ce qu'un fonds d'urgence ?",
+      "options": [
+        "Un compte pour les vacances",
+        "Une épargne pour faire face aux dépenses imprévues",
+        "Un investissement à long terme",
+        "Un prêt bancaire"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Un fonds d'urgence est une épargne réservée pour faire face aux dépenses imprévues sans s'endetter."
+    },
+    {
+      "id": "budget-q5",
+      "question": "Quelle est la différence entre une dépense fixe et une dépense variable ?",
+      "options": [
+        "Les dépenses fixes changent chaque mois, les variables restent constantes",
+        "Les dépenses fixes restent constantes, les variables changent selon l'usage",
+        "Il n'y a pas de différence",
+        "Les deux sont identiques"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Les dépenses fixes (loyer, factures) restent constantes, tandis que les dépenses variables (courses, loisirs) changent selon l'usage."
+    }
+  ],
+  "credit-dette": [
+    {
+      "id": "credit-q1",
+      "question": "Quel type de crédit est généralement le plus coûteux ?",
+      "options": [
+        "Prêt immobilier",
+        "Crédit à la consommation",
+        "Crédit renouvelable",
+        "Microcrédit"
+      ],
+      "correctAnswer": 2,
+      "explanation": "Le crédit renouvelable (carte de crédit) a généralement les taux d'intérêt les plus élevés."
+    },
+    {
+      "id": "credit-q2",
+      "question": "Qu'est-ce que le surendettement ?",
+      "options": [
+        "Avoir une seule dette",
+        "Avoir plusieurs dettes qu'on ne peut plus rembourser",
+        "Avoir un prêt immobilier",
+        "Économiser de l'argent"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Le surendettement survient quand on a accumulé trop de dettes qu'on ne peut plus rembourser avec ses revenus."
+    },
+    {
+      "id": "credit-q3",
+      "question": "Quel document est essentiel pour négocier un prêt ?",
+      "options": [
+        "Une lettre de recommandation",
+        "Un justificatif de revenus et un historique de crédit",
+        "Une photo d'identité uniquement",
+        "Aucun document n'est nécessaire"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Pour négocier un prêt, il faut prouver sa capacité de remboursement avec des justificatifs de revenus et un bon historique de crédit."
+    },
+    {
+      "id": "credit-q4",
+      "question": "Qu'est-ce que le scoring de crédit ?",
+      "options": [
+        "Le montant total des dettes",
+        "Une note qui évalue la capacité de remboursement",
+        "Le taux d'intérêt d'un prêt",
+        "La durée d'un prêt"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Le scoring de crédit est une note qui évalue votre capacité à rembourser un prêt basée sur votre historique financier."
+    }
+  ],
+  "epargne": [
+    {
+      "id": "epargne-q1",
+      "question": "Quel est l'avantage principal de diversifier son épargne ?",
+      "options": [
+        "Gagner plus d'argent rapidement",
+        "Réduire les risques en répartissant les investissements",
+        "Simplifier la gestion",
+        "Éviter de payer des impôts"
+      ],
+      "correctAnswer": 1,
+      "explanation": "La diversification permet de réduire les risques en répartissant l'épargne entre différents types de placements."
+    },
+    {
+      "id": "epargne-q2",
+      "question": "Qu'est-ce qu'une action en bourse ?",
+      "options": [
+        "Un prêt à une entreprise",
+        "Une part de propriété d'une entreprise",
+        "Un compte d'épargne",
+        "Une assurance"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Une action représente une part de propriété d'une entreprise. En achetant une action, vous devenez actionnaire."
+    },
+    {
+      "id": "epargne-q3",
+      "question": "Quelle est la différence entre épargne de précaution et épargne retraite ?",
+      "options": [
+        "L'épargne de précaution est pour les urgences, l'épargne retraite pour le long terme",
+        "Il n'y a pas de différence",
+        "L'épargne retraite est pour les urgences",
+        "Les deux sont identiques"
+      ],
+      "correctAnswer": 0,
+      "explanation": "L'épargne de précaution sert aux urgences à court terme, tandis que l'épargne retraite est un investissement à long terme."
+    },
+    {
+      "id": "epargne-q4",
+      "question": "Qu'est-ce qu'un investissement locatif ?",
+      "options": [
+        "Acheter une maison pour y vivre",
+        "Acheter un bien immobilier pour le louer et générer des revenus",
+        "Louer un appartement",
+        "Vendre une propriété"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Un investissement locatif consiste à acheter un bien immobilier pour le louer et générer des revenus réguliers."
+    },
+    {
+      "id": "epargne-q5",
+      "question": "Pourquoi est-il important de planifier sa retraite tôt ?",
+      "options": [
+        "Pour éviter de travailler",
+        "Pour bénéficier des intérêts composés sur le long terme",
+        "Pour dépenser plus maintenant",
+        "Ce n'est pas important"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Commencer tôt permet de bénéficier des intérêts composés, où les intérêts génèrent eux-mêmes des intérêts sur le long terme."
+    }
+  ],
+  "finance-entrepreneurs": [
+    {
+      "id": "entrepreneur-q1",
+      "question": "Qu'est-ce qu'un business plan financier ?",
+      "options": [
+        "Un document marketing",
+        "Un plan détaillant les prévisions de revenus et dépenses",
+        "Un contrat avec les clients",
+        "Une liste de fournisseurs"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Un business plan financier détaille les prévisions de revenus, dépenses et besoins de financement sur une période donnée."
+    },
+    {
+      "id": "entrepreneur-q2",
+      "question": "Qu'est-ce que la trésorerie d'une entreprise ?",
+      "options": [
+        "Les dettes de l'entreprise",
+        "L'argent disponible en caisse et en banque",
+        "Les investissements à long terme",
+        "Le chiffre d'affaires"
+      ],
+      "correctAnswer": 1,
+      "explanation": "La trésorerie représente l'argent disponible immédiatement (caisse et comptes bancaires) pour faire face aux dépenses."
+    },
+    {
+      "id": "entrepreneur-q3",
+      "question": "Quel est le principal risque d'un problème de cash-flow ?",
+      "options": [
+        "Perte de clients",
+        "Impossibilité de payer les factures même avec des revenus",
+        "Augmentation des ventes",
+        "Amélioration de la trésorerie"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Un problème de cash-flow peut empêcher de payer les factures même si l'entreprise a des revenus, car l'argent n'est pas encore disponible."
+    },
+    {
+      "id": "entrepreneur-q4",
+      "question": "Qu'est-ce qu'une charge en comptabilité d'entreprise ?",
+      "options": [
+        "Un revenu",
+        "Une dépense nécessaire au fonctionnement de l'entreprise",
+        "Un investissement",
+        "Un prêt"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Une charge est une dépense nécessaire au fonctionnement de l'entreprise (salaires, loyer, matières premières, etc.)."
+    },
+    {
+      "id": "entrepreneur-q5",
+      "question": "Pourquoi est-il important de suivre régulièrement sa trésorerie ?",
+      "options": [
+        "Pour impressionner les investisseurs",
+        "Pour anticiper les problèmes de liquidité et éviter les impayés",
+        "Pour réduire les impôts",
+        "Ce n'est pas nécessaire"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Suivre régulièrement la trésorerie permet d'anticiper les problèmes de liquidité et d'éviter les impayés qui peuvent mettre l'entreprise en difficulté."
+    }
+  ],
+  "finance-digitale": [
+    {
+      "id": "digitale-q1",
+      "question": "Qu'est-ce que le mobile money ?",
+      "options": [
+        "Un type de carte bancaire",
+        "Un service permettant d'envoyer et recevoir de l'argent via un téléphone mobile",
+        "Un prêt bancaire",
+        "Une application de jeu"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Le mobile money permet d'effectuer des transactions financières (envoyer, recevoir, payer) via un téléphone mobile sans compte bancaire traditionnel."
+    },
+    {
+      "id": "digitale-q2",
+      "question": "Quelle est la meilleure pratique pour sécuriser ses paiements en ligne ?",
+      "options": [
+        "Partager son mot de passe",
+        "Utiliser l'authentification à deux facteurs",
+        "Utiliser le même mot de passe partout",
+        "Ignorer les alertes de sécurité"
+      ],
+      "correctAnswer": 1,
+      "explanation": "L'authentification à deux facteurs ajoute une couche de sécurité supplémentaire en demandant un code en plus du mot de passe."
+    },
+    {
+      "id": "digitale-q3",
+      "question": "Qu'est-ce qu'une cryptomonnaie ?",
+      "options": [
+        "Une monnaie physique",
+        "Une monnaie numérique décentralisée basée sur la blockchain",
+        "Un compte bancaire",
+        "Une carte de crédit"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Une cryptomonnaie est une monnaie numérique décentralisée qui utilise la technologie blockchain pour sécuriser les transactions."
+    },
+    {
+      "id": "digitale-q4",
+      "question": "Qu'est-ce que le phishing dans le contexte de la finance digitale ?",
+      "options": [
+        "Un type d'investissement",
+        "Une tentative de fraude pour voler des informations bancaires",
+        "Une application mobile",
+        "Un service de paiement"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Le phishing est une technique de fraude où des escrocs tentent d'obtenir vos informations bancaires en se faisant passer pour une institution légitime."
+    },
+    {
+      "id": "digitale-q5",
+      "question": "Quel est l'avantage principal des applications fintech ?",
+      "options": [
+        "Elles sont toujours gratuites",
+        "Elles offrent des services financiers plus accessibles et pratiques",
+        "Elles remplacent les banques",
+        "Elles ne nécessitent pas d'internet"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Les applications fintech offrent des services financiers plus accessibles, pratiques et souvent moins chers que les services bancaires traditionnels."
+    }
+  ],
+  "finance-agricole": [
+    {
+      "id": "agricole-q1",
+      "question": "Qu'est-ce qu'un crédit agricole saisonnier ?",
+      "options": [
+        "Un prêt pour acheter une maison",
+        "Un prêt pour financer les récoltes et les besoins saisonniers",
+        "Un investissement en bourse",
+        "Une épargne"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Un crédit agricole saisonnier finance les besoins liés aux cycles de production agricole (semences, engrais, main-d'œuvre pour les récoltes)."
+    },
+    {
+      "id": "agricole-q2",
+      "question": "Quel est l'avantage principal d'une coopérative agricole ?",
+      "options": [
+        "Réduire la concurrence",
+        "Mettre en commun les ressources et négocier de meilleurs prix",
+        "Éviter de payer des impôts",
+        "Travailler seul"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Une coopérative permet aux agriculteurs de mettre en commun leurs ressources, de négocier de meilleurs prix et de partager les risques."
+    },
+    {
+      "id": "agricole-q3",
+      "question": "Qu'est-ce que le microcrédit adapté au contexte rural ?",
+      "options": [
+        "Un prêt de très grande somme",
+        "Un petit prêt adapté aux besoins et capacités des micro-entrepreneurs ruraux",
+        "Un don",
+        "Une subvention"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Le microcrédit rural est un petit prêt adapté aux besoins spécifiques et aux capacités de remboursement des micro-entrepreneurs ruraux."
+    },
+    {
+      "id": "agricole-q4",
+      "question": "Pourquoi l'assurance agricole est-elle importante ?",
+      "options": [
+        "Pour éviter de travailler",
+        "Pour protéger contre les risques climatiques et autres aléas",
+        "Pour gagner plus d'argent",
+        "Ce n'est pas nécessaire"
+      ],
+      "correctAnswer": 1,
+      "explanation": "L'assurance agricole protège les agriculteurs contre les risques comme la sécheresse, les inondations, les maladies qui peuvent détruire les récoltes."
+    },
+    {
+      "id": "agricole-q5",
+      "question": "Quel élément est essentiel pour présenter un projet agricole à un financeur ?",
+      "options": [
+        "Une photo de famille",
+        "Une évaluation claire des besoins, des revenus prévus et de la viabilité du projet",
+        "Un simple oral",
+        "Aucun document"
+      ],
+      "correctAnswer": 1,
+      "explanation": "Pour obtenir un financement, il faut présenter un projet clair avec une évaluation des besoins, des revenus prévus et une démonstration de viabilité."
+    }
+  ]
+}
+

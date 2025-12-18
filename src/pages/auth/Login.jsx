@@ -21,6 +21,7 @@ import {
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useAuth } from '../../context/AuthContext'
+import Logo from '../../components/Logo'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -78,14 +79,17 @@ export default function Login() {
         borderColor={useColorModeValue('gray.200', 'gray.600')}
       >
         <VStack spacing={6} align="stretch">
-          <Box textAlign="center">
-            <Heading as="h1" size="xl" mb={2}>
-              Connexion
-            </Heading>
-            <Text color={useColorModeValue('gray.600', 'gray.400')}>
-              Entrez vos identifiants pour accéder à votre compte
-            </Text>
-          </Box>
+          <VStack spacing={4} textAlign="center">
+            <Logo size="lg" linkToHome={true} />
+            <Box>
+              <Heading as="h1" size="xl" mb={2}>
+                Connexion
+              </Heading>
+              <Text color={useColorModeValue('gray.600', 'gray.400')}>
+                Entrez vos identifiants pour accéder à votre compte
+              </Text>
+            </Box>
+          </VStack>
 
           <form onSubmit={handleSubmit}>
             <VStack spacing={4}>

@@ -1,9 +1,14 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@chakra-ui/react'
+import { authAPI } from '../lib/api'
 
 // Création du contexte
 export const AuthContext = createContext()
+
+// Clés localStorage
+const TOKEN_KEY = 'aleloianatra_token'
+const USER_KEY = 'aleloianatra_user'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -13,31 +18,58 @@ export function AuthProvider({ children }) {
 
   // Vérifier l'état de connexion au chargement
   useEffect(() => {
-    const storedUser = localStorage.getItem('aleloianatra_user')
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
+    const initAuth = async () => {
+      const token = localStorage.getItem(TOKEN_KEY)
+      const storedUser = localStorage.getItem(USER_KEY)
+      
+      if (token && storedUser) {
+        try {
+          // Vérifier si le token est encore valide
+          const response = await authAPI.getMe()
+          if (response.success) {
+            setUser(response.data)
+            localStorage.setItem(USER_KEY, JSON.stringify(response.data))
+          } else {
+            // Token invalide, nettoyer
+            clearAuth()
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error)
+          // En cas d'erreur, utiliser les données stockées
+          setUser(JSON.parse(storedUser))
+        }
+      }
+      setLoading(false)
     }
-    setLoading(false)
+
+    initAuth()
   }, [])
+
+  // Nettoyer l'authentification
+  const clearAuth = () => {
+    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(USER_KEY)
+    setUser(null)
+  }
+
+  // Sauvegarder l'authentification
+  const saveAuth = (userData, token) => {
+    localStorage.setItem(TOKEN_KEY, token)
+    localStorage.setItem(USER_KEY, JSON.stringify(userData))
+    setUser(userData)
+  }
 
   // Fonction de connexion
   const login = async (email, password) => {
     try {
-      // Ici, vous devrez implémenter votre logique d'authentification réelle
-      // Ceci est une simulation
-      if (email && password) {
-        const mockUser = {
-          id: '123',
-          email,
-          name: email.split('@')[0],
-          role: 'user'
-        }
-        
-        localStorage.setItem('aleloianatra_user', JSON.stringify(mockUser))
-        setUser(mockUser)
+      const response = await authAPI.login({ email, password })
+      
+      if (response.success) {
+        saveAuth(response.data.user, response.data.token)
         
         toast({
           title: 'Connexion réussie',
+          description: `Bienvenue, ${response.data.user.name} !`,
           status: 'success',
           duration: 3000,
           isClosable: true,
@@ -50,7 +82,7 @@ export function AuthProvider({ children }) {
       console.error('Login error:', error)
       toast({
         title: 'Erreur de connexion',
-        description: 'Email ou mot de passe incorrect',
+        description: error.message || 'Email ou mot de passe incorrect',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -60,23 +92,16 @@ export function AuthProvider({ children }) {
   }
 
   // Fonction d'inscription
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, audience = 'GENERAL') => {
     try {
-      // Ici, vous devrez implémenter votre logique d'inscription réelle
-      // Ceci est une simulation
-      if (name && email && password) {
-        const newUser = {
-          id: Date.now().toString(),
-          name,
-          email,
-          role: 'user'
-        }
-        
-        localStorage.setItem('aleloianatra_user', JSON.stringify(newUser))
-        setUser(newUser)
+      const response = await authAPI.register({ name, email, password, audience })
+      
+      if (response.success) {
+        saveAuth(response.data.user, response.data.token)
         
         toast({
           title: 'Compte créé avec succès',
+          description: `Bienvenue sur Alelo'IA NATRA, ${response.data.user.name} !`,
           status: 'success',
           duration: 3000,
           isClosable: true,
@@ -87,9 +112,20 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error('Registration error:', error)
+      
+      let errorMessage = 'Une erreur est survenue lors de la création de votre compte'
+      
+      if (error.status === 409) {
+        errorMessage = 'Un compte avec cet email existe déjà'
+      } else if (error.errors && error.errors.length > 0) {
+        errorMessage = error.errors.map(e => e.message).join(', ')
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
       toast({
         title: 'Erreur lors de l\'inscription',
-        description: 'Une erreur est survenue lors de la création de votre compte',
+        description: errorMessage,
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -99,17 +135,38 @@ export function AuthProvider({ children }) {
   }
 
   // Fonction de déconnexion
-  const logout = () => {
-    localStorage.removeItem('aleloianatra_user')
-    setUser(null)
+  const logout = async () => {
+    try {
+      await authAPI.logout()
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+    
+    clearAuth()
     navigate('/login')
     
     toast({
       title: 'Déconnexion réussie',
+      description: 'À bientôt !',
       status: 'info',
       duration: 3000,
       isClosable: true,
     })
+  }
+
+  // Rafraîchir les données utilisateur
+  const refreshUser = async () => {
+    try {
+      const response = await authAPI.getMe()
+      if (response.success) {
+        setUser(response.data)
+        localStorage.setItem(USER_KEY, JSON.stringify(response.data))
+        return response.data
+      }
+    } catch (error) {
+      console.error('Refresh user error:', error)
+    }
+    return null
   }
 
   // Valeur du contexte
@@ -119,11 +176,12 @@ export function AuthProvider({ children }) {
     loading,
     login,
     register,
-    logout
+    logout,
+    refreshUser,
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )
@@ -131,5 +189,9 @@ export function AuthProvider({ children }) {
 
 // Hook personnalisé pour utiliser le contexte d'authentification
 export const useAuth = () => {
-  return useContext(AuthContext)
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
 }

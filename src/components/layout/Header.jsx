@@ -1,7 +1,8 @@
 import React from 'react'
-import { Flex, IconButton, useColorMode, useColorModeValue, Heading, Button, Box } from '@chakra-ui/react'
+import { Flex, IconButton, useColorMode, useColorModeValue, Button, Box } from '@chakra-ui/react'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import { Link as RouterLink } from 'react-router-dom'
+import Logo from '../Logo'
 
 export const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode()
@@ -10,10 +11,10 @@ export const Header = () => {
   return (
     <Box as="header" bg={bg} px={4} shadow="sm" position="sticky" top={0} zIndex={10}>
       <Flex h={16} alignItems="center" justifyContent="space-between" maxW="7xl" mx="auto">
-        <Heading as={RouterLink} to="/" size="md" color="primary.500">
-          Alelo-IA-Anatra
-        </Heading>
+        {/* Logo */}
+        <Logo size="md" />
         
+        {/* Navigation */}
         <Flex alignItems="center" gap={4}>
           <IconButton
             onClick={toggleColorMode}

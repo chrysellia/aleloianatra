@@ -20,9 +20,6 @@ import {
 import { 
   FaPlay, 
   FaTimes,
-  FaSearch,
-  FaBell,
-  FaGlobe,
   FaCheckCircle,
   FaMedal,
   FaStar,
@@ -36,11 +33,32 @@ import {
 } from 'react-icons/fa'
 import { useAuth } from '../../context/AuthContext'
 import { Link as RouterLink } from 'react-router-dom'
+import Logo from '../../components/Logo'
+import { authAPI } from '../../lib/api'
 
 export default function Dashboard() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const [showBanner, setShowBanner] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [profile, setProfile] = useState(null)
+  const [loadingProfile, setLoadingProfile] = useState(true)
+
+  // Récupérer le profil utilisateur depuis l'API
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await authAPI.getMe()
+        if (response.success) {
+          setProfile(response.data)
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération du profil:', error)
+      } finally {
+        setLoadingProfile(false)
+      }
+    }
+    fetchProfile()
+  }, [])
 
   // Slides promotionnels
   const promoSlides = [
@@ -121,36 +139,36 @@ export default function Dashboard() {
       <Box bg={bgColor} borderBottom="1px" borderColor={borderColor} position="sticky" top={0} zIndex={100}>
         <Flex h={16} alignItems="center" justifyContent="space-between" px={{ base: 4, md: 8, lg: 12 }}>
             <HStack spacing={8}>
-              <Heading as={RouterLink} to="/" size="md" color={darkBlue} fontWeight="bold">
-                Alelo'IA-Anatra
-              </Heading>
+              <Logo size="sm" />
               <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
-                <Link as={RouterLink} to="/" fontWeight="medium" color={darkBlue}>
+                <Link 
+                  as={RouterLink} 
+                  to="/dashboard" 
+                  fontWeight="semibold" 
+                  color={darkBlue}
+                  bg="gray.100"
+                  px={3}
+                  py={1}
+                  borderRadius="md"
+                  _hover={{ bg: 'gray.200' }}
+                >
                   Accueil
                 </Link>
-                <Link as={RouterLink} to="/modules" fontWeight="medium" color={darkBlue}>
+                <Link as={RouterLink} to="/modules" fontWeight="medium" color={darkBlue} _hover={{ color: greenColor }}>
                   Apprendre
                 </Link>
               </HStack>
             </HStack>
             <HStack spacing={4}>
-              <IconButton
-                icon={<FaSearch />}
-                variant="ghost"
-                aria-label="Rechercher"
-                display={{ base: 'none', md: 'flex' }}
-              />
-              <IconButton
-                icon={<FaGlobe />}
-                variant="ghost"
-                aria-label="Langue"
-              />
-              <IconButton
-                icon={<FaBell />}
-                variant="ghost"
-                aria-label="Notifications"
-              />
               <Avatar size="sm" name={userName} bg={greenColor} />
+              <Button
+                size="sm"
+                variant="outline"
+                colorScheme="red"
+                onClick={logout}
+              >
+                Se déconnecter
+              </Button>
             </HStack>
           </Flex>
       </Box>
@@ -438,12 +456,12 @@ export default function Dashboard() {
                 borderColor={borderColor}
               >
                 <VStack spacing={4}>
-                  <Avatar size="xl" name={userName} bg={greenColor} />
+                  <Avatar size="xl" name={profile?.name || userName} bg={greenColor} />
                   <VStack spacing={1}>
                     <Text fontWeight="bold" fontSize="lg" color={darkBlue}>
-                      Salut, {userName}!
+                      Salut, {profile?.name || userName}!
                     </Text>
-                    <Link color={greenColor} fontSize="sm" fontWeight="medium">
+                    <Link as={RouterLink} to="/profile" color={greenColor} fontSize="sm" fontWeight="medium">
                       Voir le profil {'>'}
                     </Link>
                   </VStack>
@@ -453,10 +471,15 @@ export default function Dashboard() {
                         Profil
                       </Text>
                       <Text fontSize="sm" fontWeight="medium" color={darkBlue}>
-                        25% complété
+                        {profile?.profileCompletion || 0}% complété
                       </Text>
                     </HStack>
-                    <Progress value={25} colorScheme="green" size="sm" borderRadius="full" />
+                    <Progress 
+                      value={profile?.profileCompletion || 0} 
+                      colorScheme="green" 
+                      size="sm" 
+                      borderRadius="full" 
+                    />
                   </Box>
                   <Divider />
                   <HStack justify="space-between" w="100%">
@@ -466,7 +489,7 @@ export default function Dashboard() {
                       </Text>
                       <HStack>
                         <Text fontSize="lg" fontWeight="bold" color={darkBlue}>
-                          ⚡ 0 jours
+                          ⚡ {profile?.dailyStreak || 0} jours
                         </Text>
                       </HStack>
                     </VStack>
@@ -476,8 +499,8 @@ export default function Dashboard() {
                       <Text fontSize="xs" color={textSecondary}>
                         Total XP
                       </Text>
-                      <Text fontSize="lg" fontWeight="bold" color={darkBlue}>
-                        15043 XP
+                      <Text fontSize="lg" fontWeight="bold" color={greenColor}>
+                        {profile?.xpTotal?.toLocaleString() || 0} XP
                       </Text>
                     </VStack>
                   </HStack>

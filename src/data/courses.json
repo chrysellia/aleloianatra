@@ -1,0 +1,202 @@
+[
+  {
+    "id": "budget-personnel",
+    "title": "Budget personnel",
+    "level": "Débutant",
+    "description": "Maîtrisez la gestion de votre budget au quotidien et apprenez à contrôler vos dépenses pour atteindre vos objectifs financiers.",
+    "estimatedMinutes": 120,
+    "lessons": [
+      {
+        "id": "budget-l1",
+        "title": "Les bases de la budgétisation",
+        "summary": "Comprendre les concepts fondamentaux : revenus, dépenses fixes et variables, épargne. Apprendre à établir un budget mensuel réaliste adapté à votre situation."
+      },
+      {
+        "id": "budget-l2",
+        "title": "Suivre ses dépenses",
+        "summary": "Méthodes pratiques pour enregistrer et catégoriser vos dépenses. Utiliser des outils simples (carnet, application mobile) pour suivre votre argent au quotidien."
+      },
+      {
+        "id": "budget-l3",
+        "title": "Établir un plan d'épargne",
+        "summary": "Définir des objectifs d'épargne (court, moyen et long terme). Calculer combien épargner chaque mois. Techniques pour épargner même avec un petit revenu."
+      },
+      {
+        "id": "budget-l4",
+        "title": "Gérer les dettes",
+        "summary": "Comprendre les différents types de dettes. Stratégies pour rembourser efficacement : méthode boule de neige, priorisation. Éviter le surendettement."
+      },
+      {
+        "id": "budget-l5",
+        "title": "Planifier les dépenses imprévues",
+        "summary": "Créer un fonds d'urgence. Anticiper les dépenses saisonnières et les imprévus. Gérer les urgences financières sans s'endetter."
+      }
+    ]
+  },
+  {
+    "id": "credit-dette",
+    "title": "Crédit & Dette",
+    "level": "Intermédiaire",
+    "description": "Gérez vos emprunts intelligemment et évitez le surendettement. Apprenez à négocier des prêts et à comprendre les conditions de crédit.",
+    "estimatedMinutes": 90,
+    "lessons": [
+      {
+        "id": "credit-l1",
+        "title": "Comprendre les différents types de crédits",
+        "summary": "Crédit à la consommation, prêt immobilier, crédit renouvelable, microcrédit. Avantages et inconvénients de chaque type. Taux d'intérêt et coûts réels."
+      },
+      {
+        "id": "credit-l2",
+        "title": "Négocier un prêt",
+        "summary": "Comment préparer sa demande de crédit. Documents nécessaires. Comparer les offres des différentes institutions. Négocier les taux et conditions."
+      },
+      {
+        "id": "credit-l3",
+        "title": "Sortir du surendettement",
+        "summary": "Reconnaître les signes de surendettement. Stratégies de remboursement. Renégocier avec les créanciers. Faire appel à un médiateur si nécessaire."
+      },
+      {
+        "id": "credit-l4",
+        "title": "Gérer son historique de crédit",
+        "summary": "Comprendre le scoring et l'historique de crédit. Comment améliorer sa cote de crédit. Impact sur les futures demandes de prêt."
+      }
+    ]
+  },
+  {
+    "id": "epargne",
+    "title": "Épargne",
+    "level": "Débutant",
+    "description": "Apprenez à faire fructifier votre argent et à construire votre patrimoine. Découvrez les différentes options d'épargne adaptées à vos objectifs.",
+    "estimatedMinutes": 150,
+    "lessons": [
+      {
+        "id": "epargne-l1",
+        "title": "Les différents types d'épargne",
+        "summary": "Épargne de précaution, épargne de projet, épargne retraite. Comptes épargne, livrets, dépôts à terme. Choisir selon ses objectifs et horizon temporel."
+      },
+      {
+        "id": "epargne-l2",
+        "title": "Débuter en bourse",
+        "summary": "Comprendre le fonctionnement de la bourse. Actions, obligations, fonds. Risques et rendements. Comment commencer avec un petit capital."
+      },
+      {
+        "id": "epargne-l3",
+        "title": "Investir dans l'immobilier",
+        "summary": "Investissement locatif, achat pour résidence principale. Calculer la rentabilité. Financement d'un investissement immobilier. Pièges à éviter."
+      },
+      {
+        "id": "epargne-l4",
+        "title": "Planifier sa retraite",
+        "summary": "Estimer ses besoins à la retraite. Épargne retraite obligatoire et complémentaire. Stratégies d'épargne long terme. Préparer l'avenir dès maintenant."
+      },
+      {
+        "id": "epargne-l5",
+        "title": "Diversification et gestion des risques",
+        "summary": "Ne pas mettre tous ses œufs dans le même panier. Répartir son épargne entre différents placements. Gérer le risque selon son profil."
+      }
+    ]
+  },
+  {
+    "id": "finance-entrepreneurs",
+    "title": "Finance pour entrepreneurs",
+    "level": "Intermédiaire",
+    "description": "Gérez les finances de votre entreprise efficacement. Apprenez à établir un business plan financier, gérer la trésorerie et financer votre croissance.",
+    "estimatedMinutes": 180,
+    "lessons": [
+      {
+        "id": "entrepreneur-l1",
+        "title": "Établir un business plan financier",
+        "summary": "Prévisions de revenus et dépenses. Tableaux de bord financiers. Plan de trésorerie sur 12 mois. Identifier les besoins de financement."
+      },
+      {
+        "id": "entrepreneur-l2",
+        "title": "Gérer la trésorerie",
+        "summary": "Suivre les entrées et sorties d'argent. Gérer les délais de paiement clients et fournisseurs. Anticiper les besoins de liquidité. Éviter les problèmes de cash-flow."
+      },
+      {
+        "id": "entrepreneur-l3",
+        "title": "Financer sa croissance",
+        "summary": "Sources de financement : prêts bancaires, investisseurs, microfinance. Préparer un dossier de financement convaincant. Négocier avec les investisseurs."
+      },
+      {
+        "id": "entrepreneur-l4",
+        "title": "Comprendre la fiscalité d'entreprise",
+        "summary": "Impôts et taxes applicables. Déductions fiscales possibles. Obligations déclaratives. Optimisation fiscale légale. S'entourer de professionnels."
+      },
+      {
+        "id": "entrepreneur-l5",
+        "title": "Gérer la comptabilité de base",
+        "summary": "Tenir un livre de comptes simple. Distinguer charges et produits. Calculer le bénéfice. Comprendre les états financiers de base."
+      }
+    ]
+  },
+  {
+    "id": "finance-digitale",
+    "title": "Finance digitale (mobile money, fintech)",
+    "level": "Débutant",
+    "description": "Maîtrisez les outils financiers numériques : mobile money, paiements en ligne, fintech. Apprenez à utiliser ces services en toute sécurité.",
+    "estimatedMinutes": 100,
+    "lessons": [
+      {
+        "id": "digitale-l1",
+        "title": "Utiliser le mobile money",
+        "summary": "M-Pesa, Orange Money, Airtel Money : fonctionnement et avantages. Envoyer et recevoir de l'argent. Payer des factures. Recharger son compte. Sécurité et limites."
+      },
+      {
+        "id": "digitale-l2",
+        "title": "Paiements en ligne sécurisés",
+        "summary": "Cartes bancaires virtuelles. Portefeuilles électroniques. Vérifier la sécurité d'un site de paiement. Protéger ses informations bancaires. Éviter les fraudes."
+      },
+      {
+        "id": "digitale-l3",
+        "title": "Cryptomonnaies et blockchain",
+        "summary": "Comprendre les cryptomonnaies (Bitcoin, etc.). Comment ça fonctionne. Acheter et vendre des cryptomonnaies. Risques et opportunités. Réglementation locale."
+      },
+      {
+        "id": "digitale-l4",
+        "title": "Applications financières (fintech)",
+        "summary": "Applications de gestion de budget, d'épargne, de crédit. Comparer et choisir les meilleures apps. Utiliser les services fintech en toute sécurité."
+      },
+      {
+        "id": "digitale-l5",
+        "title": "Sécurité numérique et protection",
+        "summary": "Protéger ses comptes en ligne. Mots de passe forts. Authentification à deux facteurs. Reconnaître les tentatives de phishing. Que faire en cas de fraude."
+      }
+    ]
+  },
+  {
+    "id": "finance-agricole",
+    "title": "Finance agricole / microfinance",
+    "level": "Intermédiaire",
+    "description": "Solutions financières adaptées au contexte local : accès au crédit agricole, gestion des coopératives, micro-entrepreneuriat rural.",
+    "estimatedMinutes": 140,
+    "lessons": [
+      {
+        "id": "agricole-l1",
+        "title": "Accès au crédit agricole",
+        "summary": "Crédits saisonniers pour les récoltes. Financement d'équipements agricoles. Conditions et garanties. Institutions spécialisées (banques agricoles, coopératives)."
+      },
+      {
+        "id": "agricole-l2",
+        "title": "Gestion des coopératives",
+        "summary": "Fonctionnement d'une coopérative agricole. Gestion financière collective. Répartition des bénéfices. Transparence et comptabilité. Rôle des membres."
+      },
+      {
+        "id": "agricole-l3",
+        "title": "Micro-entrepreneuriat rural",
+        "summary": "Financer une petite activité rurale (élevage, transformation, commerce). Microcrédit adapté. Gérer les revenus irréguliers. Épargne pour les périodes creuses."
+      },
+      {
+        "id": "agricole-l4",
+        "title": "Assurance agricole",
+        "summary": "Protéger sa récolte contre les risques (sécheresse, inondations, maladies). Types d'assurances disponibles. Coûts et bénéfices. Comment souscrire."
+      },
+      {
+        "id": "agricole-l5",
+        "title": "Financement de projets agricoles",
+        "summary": "Préparer un projet agricole viable. Évaluer les besoins de financement. Présenter son projet aux financeurs. Suivre et gérer les fonds obtenus."
+      }
+    ]
+  }
+]
+

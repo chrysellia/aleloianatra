@@ -14,12 +14,16 @@ import Analyzer from './pages/Analyzer'
 import Adaptive from './pages/Adaptive'
 import { AuthProvider } from './context/AuthContext'
 import Community from './pages/Community'
+import CourseComplete from './pages/CourseComplete'
+import Lesson from './pages/Lesson'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function Layout({ children }) {
   const location = useLocation()
   const isDashboard = location.pathname === '/dashboard'
+  const isCourseComplete = location.pathname.startsWith('/course-complete')
 
-  if (isDashboard) {
+  if (isDashboard || isCourseComplete) {
     return <>{children}</>
   }
 
@@ -42,16 +46,62 @@ export default function App() {
       <Box minH="100vh" display="flex" flexDirection="column">
         <Layout>
           <Routes>
+            {/* Routes publiques */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/modules" element={<Modules />} />
-            <Route path="/modules/:moduleId" element={<ModuleDetail />} />
-            <Route path="/quiz" element={<Quiz />} />
-            <Route path="/analyze" element={<Analyzer />} />
-            <Route path="/adaptive" element={<Adaptive />} />
-            <Route path="/community" element={<Community />} />
+            
+            {/* Routes protégées */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/modules" element={
+              <ProtectedRoute>
+                <Modules />
+              </ProtectedRoute>
+            } />
+            <Route path="/modules/:moduleId" element={
+              <ProtectedRoute>
+                <ModuleDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/modules/:moduleId/lessons/:lessonId" element={
+              <ProtectedRoute>
+                <Lesson />
+              </ProtectedRoute>
+            } />
+            <Route path="/modules/:moduleId/quiz" element={
+              <ProtectedRoute>
+                <Quiz />
+              </ProtectedRoute>
+            } />
+            <Route path="/quiz" element={
+              <ProtectedRoute>
+                <Quiz />
+              </ProtectedRoute>
+            } />
+            <Route path="/analyze" element={
+              <ProtectedRoute>
+                <Analyzer />
+              </ProtectedRoute>
+            } />
+            <Route path="/adaptive" element={
+              <ProtectedRoute>
+                <Adaptive />
+              </ProtectedRoute>
+            } />
+            <Route path="/community" element={
+              <ProtectedRoute>
+                <Community />
+              </ProtectedRoute>
+            } />
+            <Route path="/course-complete/:moduleId" element={
+              <ProtectedRoute>
+                <CourseComplete />
+              </ProtectedRoute>
+            } />
           </Routes>
         </Layout>
       </Box>

@@ -22,6 +22,7 @@ import {
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useAuth } from '../../context/AuthContext'
+import Logo from '../../components/Logo'
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -117,14 +118,17 @@ export default function Register() {
         borderColor={useColorModeValue('gray.200', 'gray.600')}
       >
         <VStack spacing={6} align="stretch">
-          <Box textAlign="center">
-            <Heading as="h1" size="xl" mb={2}>
-              Créer un compte
-            </Heading>
-            <Text color={useColorModeValue('gray.600', 'gray.400')}>
-              Rejoignez notre communauté d'apprenants
-            </Text>
-          </Box>
+          <VStack spacing={4} textAlign="center">
+            <Logo size="lg" linkToHome={true} />
+            <Box>
+              <Heading as="h1" size="xl" mb={2}>
+                Créer un compte
+              </Heading>
+              <Text color={useColorModeValue('gray.600', 'gray.400')}>
+                Rejoignez notre communauté d'apprenants
+              </Text>
+            </Box>
+          </VStack>
 
           <form onSubmit={handleSubmit}>
             <VStack spacing={4}>

@@ -1,7 +1,8 @@
 import React from 'react'
-import { Box, Container, Heading, Text, SimpleGrid, Button, VStack, useColorModeValue } from '@chakra-ui/react'
+import { Box, Container, Heading, Text, SimpleGrid, Button, VStack, HStack, useColorModeValue } from '@chakra-ui/react'
 import { Link as RouterLink } from 'react-router-dom'
 import { FaGraduationCap, FaSearch, FaChartLine, FaUsers } from 'react-icons/fa'
+import Logo from '../components/Logo'
 
 const features = [
   {
@@ -39,18 +40,79 @@ export default function Home() {
   return (
     <Box>
       {/* Hero Section */}
-      <Box bg={bgGradient} color="white" py={20}>
+      <Box 
+        bgGradient="linear(135deg, #03045E 0%, #0A0A2E 100%)" 
+        color="white" 
+        py={20}
+      >
         <Container maxW="container.xl">
-          <VStack spacing={6} textAlign="center">
-            <Heading as="h1" size="2xl" fontWeight="bold">
-              Renforcez votre esprit critique avec Alelo-IA-Anatra
+          <VStack spacing={8} textAlign="center">
+            {/* Logo en grand */}
+            <HStack spacing={4} justify="center">
+              <Box
+                w="80px"
+                h="80px"
+                bg="white"
+                borderRadius="2xl"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                boxShadow="lg"
+              >
+                <Text color="#03045E" fontSize="48px" fontWeight="bold">A</Text>
+              </Box>
+              <VStack spacing={0} align="start">
+                <Heading 
+                  as="h1" 
+                  fontSize={{ base: '3xl', md: '5xl' }} 
+                  fontWeight="bold"
+                  color="white"
+                >
+                  ALELO'IA
+                </Heading>
+                <Text 
+                  fontSize={{ base: 'lg', md: '2xl' }} 
+                  fontWeight="bold" 
+                  color="#03EF62"
+                  letterSpacing="8px"
+                >
+                  NATRA
+                </Text>
+              </VStack>
+            </HStack>
+
+            <Heading as="h2" size="lg" fontWeight="normal" opacity={0.9}>
+              Renforcez votre esprit critique
             </Heading>
-            <Text fontSize="xl" maxW="2xl">
-              Une plateforme éducative interactive pour développer votre esprit critique et votre analyse des médias dans le contexte malgache et africain.
+            <Text fontSize="xl" maxW="2xl" opacity={0.8}>
+              Une plateforme éducative interactive pour développer votre esprit critique 
+              et votre analyse des médias dans le contexte malgache et africain.
             </Text>
-            <Button as={RouterLink} to="/register" colorScheme="white" variant="outline" size="lg" mt={4}>
-              Commencer maintenant
-            </Button>
+            <HStack spacing={4} mt={4}>
+              <Button 
+                as={RouterLink} 
+                to="/register" 
+                bg="#03EF62" 
+                color="#03045E"
+                size="lg" 
+                fontWeight="bold"
+                _hover={{ bg: '#00D97E', transform: 'translateY(-2px)' }}
+                boxShadow="lg"
+              >
+                Commencer gratuitement
+              </Button>
+              <Button 
+                as={RouterLink} 
+                to="/modules" 
+                variant="outline" 
+                borderColor="white"
+                color="white"
+                size="lg"
+                _hover={{ bg: 'whiteAlpha.200' }}
+              >
+                Explorer les cours
+              </Button>
+            </HStack>
           </VStack>
         </Container>
       </Box>
