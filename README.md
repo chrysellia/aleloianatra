@@ -57,7 +57,7 @@ Réponse (Ce que le Front reçoit) :
 Requête :
 ```bash
     {
-      "lesson_content": "Le code PIN Mobile Money doit rester secret.",
+      "lesson_id": "L02",
       "num_questions": 1,
       "user_level": "débutant" #Valeur par défaut 'débutant'
     }  
