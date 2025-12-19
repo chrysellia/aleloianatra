@@ -155,6 +155,8 @@ export const getModuleQuizzes = asyncHandler(async (req, res) => {
       id: true,
       question: true,
       choices: true,
+      correctIndex: true,
+      rationale: true,
       difficulty: true,
       tags: true,
       audiences: true

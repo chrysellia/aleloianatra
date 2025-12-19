@@ -263,6 +263,10 @@ app.use('/api/analyze', analyzeRoutes)
 app.use('/api/community', communityRoutes)
 app.use('/api/achievements', achievementRoutes)
 
+// Internal API Routes for AI Brain service
+import aiInternalRoutes from './routes/ai-internal.routes.js'
+app.use('/api/internal', aiInternalRoutes)
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ 
