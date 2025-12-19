@@ -38,6 +38,7 @@ Une fois lancé, accède au Swagger ici : http://127.0.0.1:8000/docs
 Requête (Ce que le Front envoie) :
 ```bash
     {
+      "user_id": "user_test_01"
       "message": "C'est quoi l'épargne ?",
       "user_level": "débutant",
       "lesson_id": "L01"
@@ -56,8 +57,9 @@ Réponse (Ce que le Front reçoit) :
 Requête :
 ```bash
     {
-      "lesson_content": "Le code PIN Mobile Money doit rester secret.",
-      "num_questions": 1
+      "lesson_id": "L02",
+      "num_questions": 1,
+      "user_level": "débutant" #Valeur par défaut 'débutant'
     }  
 ```
 Réponse :
