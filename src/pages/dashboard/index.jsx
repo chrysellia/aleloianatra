@@ -32,16 +32,22 @@ import {
   FaArrowRight
 } from 'react-icons/fa'
 import { useAuth } from '../../context/AuthContext'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import Logo from '../../components/Logo'
-import { authAPI } from '../../lib/api'
+import { authAPI, usersAPI, progressAPI, modulesAPI } from '../../lib/api'
 
 export default function Dashboard() {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [showBanner, setShowBanner] = useState(true)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [profile, setProfile] = useState(null)
   const [loadingProfile, setLoadingProfile] = useState(true)
+  const [achievements, setAchievements] = useState([])
+  const [loadingAchievements, setLoadingAchievements] = useState(true)
+  const [coursesInProgress, setCoursesInProgress] = useState([])
+  const [availableModules, setAvailableModules] = useState([])
+  const [loadingCourses, setLoadingCourses] = useState(true)
 
   // Récupérer le profil utilisateur depuis l'API
   useEffect(() => {
@@ -59,6 +65,77 @@ export default function Dashboard() {
     }
     fetchProfile()
   }, [])
+
+  // Récupérer les réalisations depuis l'API
+  useEffect(() => {
+    const fetchAchievements = async () => {
+      if (!user?.id) return
+      
+      try {
+        const response = await usersAPI.getAchievements(user.id)
+        if (response.success && response.data.length > 0) {
+          // Transformer les données de l'API pour correspondre au format attendu
+          const formattedAchievements = response.data.slice(0, 3).map((achievement) => {
+            // Mapper les icônes depuis les emojis/noms
+            let icon = FaCheckCircle // Par défaut
+            const iconStr = achievement.icon || ''
+            const nameLower = achievement.name?.toLowerCase() || ''
+            
+            if (iconStr.includes('🏆') || nameLower.includes('crusher') || nameLower.includes('course')) {
+              icon = FaCheckCircle
+            } else if (iconStr.includes('🧠') || nameLower.includes('master') || nameLower.includes('quiz')) {
+              icon = FaMedal
+            } else if (iconStr.includes('⭐') || iconStr.includes('star') || nameLower.includes('hunter') || nameLower.includes('xp')) {
+              icon = FaStar
+            } else if (iconStr.includes('🔥') || nameLower.includes('streak') || nameLower.includes('legend')) {
+              icon = FaStar
+            } else if (iconStr.includes('🎯') || nameLower.includes('premier') || nameLower.includes('pas')) {
+              icon = FaCheckCircle
+            }
+            
+            return {
+              id: achievement.id,
+              name: achievement.name,
+              count: achievement.count || 0,
+              color: achievement.color || greenColor,
+              icon: icon
+            }
+          })
+          
+          // Si moins de 3 achievements, compléter avec des placeholders
+          while (formattedAchievements.length < 3) {
+            formattedAchievements.push({
+              id: `placeholder-${formattedAchievements.length + 1}`,
+              name: 'À venir',
+              count: 0,
+              color: '#gray.300',
+              icon: FaCheckCircle
+            })
+          }
+          
+          setAchievements(formattedAchievements)
+        } else {
+          // Aucune réalisation obtenue, afficher des placeholders
+          setAchievements([
+            { id: 1, name: "Course Crusher", count: 0, color: greenColor, icon: FaCheckCircle },
+            { id: 2, name: "Quiz Master", count: 0, color: "#764ba2", icon: FaMedal },
+            { id: 3, name: "XP Hunter", count: 0, color: "#FFD700", icon: FaStar },
+          ])
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des réalisations:', error)
+        // En cas d'erreur, utiliser des données par défaut
+        setAchievements([
+          { id: 1, name: "Course Crusher", count: 0, color: greenColor, icon: FaCheckCircle },
+          { id: 2, name: "Quiz Master", count: 0, color: "#764ba2", icon: FaMedal },
+          { id: 3, name: "XP Hunter", count: 0, color: "#FFD700", icon: FaStar },
+        ])
+      } finally {
+        setLoadingAchievements(false)
+      }
+    }
+    fetchAchievements()
+  }, [user?.id])
 
   // Slides promotionnels
   const promoSlides = [
@@ -100,29 +177,78 @@ export default function Dashboard() {
   const greenColor = '#00D97E'
   const darkBlue = '#0B1426'
 
-  // Données de démonstration
-  const courses = [
-    {
-      id: 1,
-      title: "Introduction à l'IA pour le Travail",
-      progress: 3,
-      timeRemaining: "1h 56min",
-      category: "Intelligence Artificielle"
-    },
-    {
-      id: 2,
-      title: "Détection des Fake News",
-      progress: 45,
-      timeRemaining: "2h 30min",
-      category: "Pensée Critique"
-    }
-  ]
+  // Récupérer les cours en cours et les modules disponibles
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        // Récupérer les cours en cours
+        const progressResponse = await progressAPI.getRecent(5)
+        
+        if (progressResponse.success && progressResponse.data.length > 0) {
+          // Transformer les données de l'API pour correspondre au format attendu
+          const formattedCourses = progressResponse.data.map((progress) => {
+            // Mapper le level vers une catégorie
+            const levelToCategory = {
+              'BEGINNER': 'Débutant',
+              'INTERMEDIATE': 'Intermédiaire',
+              'ADVANCED': 'Avancé',
+              'PRACTICAL': 'Pratique'
+            }
+            
+            return {
+              id: progress.moduleId,
+              title: progress.module.title,
+              progress: progress.progressPercent,
+              timeRemaining: progress.remainingTime || `${progress.remainingMinutes}min`,
+              category: levelToCategory[progress.module.level] || progress.module.level
+            }
+          })
+          setCoursesInProgress(formattedCourses)
+        } else {
+          setCoursesInProgress([])
+        }
 
-  const achievements = [
-    { id: 1, name: "Course Crusher", count: 3, color: greenColor, icon: FaCheckCircle },
-    { id: 2, name: "Podium Finisher", count: 1, color: "#764ba2", icon: FaMedal },
-    { id: 3, name: "Best Finish", count: 13, color: "#FFD700", icon: FaStar },
-  ]
+        // Toujours récupérer les modules disponibles pour les propositions
+        const modulesResponse = await modulesAPI.getAll()
+        if (modulesResponse.success && modulesResponse.data.length > 0) {
+          const levelToCategory = {
+            'BEGINNER': 'Débutant',
+            'INTERMEDIATE': 'Intermédiaire',
+            'ADVANCED': 'Avancé',
+            'PRACTICAL': 'Pratique'
+          }
+          
+          const formattedModules = modulesResponse.data.map((module) => {
+            // Calculer le temps total estimé
+            const totalMinutes = module.estimatedMinutes || 0
+            const hours = Math.floor(totalMinutes / 60)
+            const mins = totalMinutes % 60
+            const timeStr = hours > 0 ? `${hours}h ${mins}min` : `${mins}min`
+            
+            return {
+              id: module.id,
+              title: module.title,
+              description: module.description,
+              progress: module.userProgress?.progressPercent || 0,
+              timeRemaining: timeStr,
+              category: levelToCategory[module.level] || module.level,
+              level: module.level
+            }
+          })
+          setAvailableModules(formattedModules)
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des cours:', error)
+        setCoursesInProgress([])
+        setAvailableModules([])
+      } finally {
+        setLoadingCourses(false)
+      }
+    }
+    fetchCourses()
+  }, [])
+
+  // Les achievements sont maintenant chargés depuis l'API (voir useEffect ci-dessus)
 
   const certifications = [
     { id: 1, title: "Data Engineer", locked: true },
@@ -307,52 +433,140 @@ export default function Dashboard() {
                     </Heading>
                   </HStack>
                 </HStack>
-                <VStack spacing={4} align="stretch">
-                  {courses.map((course) => (
-                    <Box
-                      key={course.id}
-                      bg={darkBlue}
-                      borderRadius="lg"
-                      p={6}
-                      color="white"
-                    >
-                      <Flex direction={{ base: 'column', md: 'row' }} gap={6} align="center">
-                        <VStack align="start" spacing={2} flex="1">
-                          <Text fontSize="sm" opacity={0.8}>
-                            {course.category}
-                          </Text>
-                          <Heading size="md" fontWeight="bold">
-                            {course.title}
-                          </Heading>
-                        </VStack>
-                        <Box w={{ base: '100%', md: '300px' }}>
-                          <HStack justify="space-between" mb={2}>
-                            <Text fontSize="sm" opacity={0.8}>
-                              {course.progress}% complété
-                            </Text>
-                            <Text fontSize="sm" opacity={0.8}>
-                              {course.timeRemaining} restant
-                            </Text>
-                          </HStack>
-                          <Progress 
-                            value={course.progress} 
-                            colorScheme="green"
-                            size="sm"
-                            borderRadius="full"
-                          />
-                        </Box>
-                        <Button
-                          leftIcon={<FaPlay />}
-                          bg={greenColor}
-                          color="white"
-                          _hover={{ bg: '#00C96E' }}
-                          px={8}
-                        >
-                          Continuer
-                        </Button>
-                      </Flex>
+                <VStack spacing={6} align="stretch">
+                  {loadingCourses ? (
+                    <Box textAlign="center" py={8}>
+                      <Text color={textSecondary}>Chargement des cours...</Text>
                     </Box>
-                  ))}
+                  ) : coursesInProgress.length > 0 ? (
+                    // Afficher les cours en cours
+                    coursesInProgress.map((course) => (
+                      <Box
+                        key={course.id}
+                        bg={darkBlue}
+                        borderRadius="lg"
+                        p={6}
+                        color="white"
+                      >
+                        <Flex direction={{ base: 'column', md: 'row' }} gap={6} align="center">
+                          <VStack align="start" spacing={2} flex="1">
+                            <Text fontSize="sm" opacity={0.8}>
+                              {course.category}
+                            </Text>
+                            <Heading size="md" fontWeight="bold">
+                              {course.title}
+                            </Heading>
+                          </VStack>
+                          <Box w={{ base: '100%', md: '300px' }}>
+                            <HStack justify="space-between" mb={2}>
+                              <Text fontSize="sm" opacity={0.8}>
+                                {course.progress}% complété
+                              </Text>
+                              <Text fontSize="sm" opacity={0.8}>
+                                {course.timeRemaining} restant
+                              </Text>
+                            </HStack>
+                            <Progress 
+                              value={course.progress} 
+                              colorScheme="green"
+                              size="sm"
+                              borderRadius="full"
+                            />
+                          </Box>
+                          <Button
+                            leftIcon={<FaPlay />}
+                            bg={greenColor}
+                            color="white"
+                            _hover={{ bg: '#00C96E' }}
+                            px={8}
+                            onClick={() => navigate(`/modules/${course.id}`)}
+                          >
+                            Continuer
+                          </Button>
+                        </Flex>
+                      </Box>
+                    ))
+                  ) : (
+                    // Aucun cours en cours - Afficher message + propositions
+                    <>
+                      <Box
+                        bg={cardBg}
+                        borderRadius="lg"
+                        p={8}
+                        textAlign="center"
+                        borderWidth="1px"
+                        borderColor={borderColor}
+                      >
+                        <Text color={textSecondary} mb={4}>
+                          Aucun cours en cours pour le moment
+                        </Text>
+                        <Button
+                          as={RouterLink}
+                          to="/modules"
+                          colorScheme="green"
+                          leftIcon={<FaPlay />}
+                        >
+                          Découvrir les modules
+                        </Button>
+                      </Box>
+
+                      {/* Propositions de cours à commencer */}
+                      {availableModules.length > 0 && (
+                        <Box>
+                          <Heading size="md" color={darkBlue} mb={4}>
+                            Cours recommandés pour commencer
+                          </Heading>
+                          <VStack spacing={4} align="stretch">
+                            {availableModules.slice(0, 3).map((module) => (
+                              <Box
+                                key={module.id}
+                                bg={darkBlue}
+                                borderRadius="lg"
+                                p={6}
+                                color="white"
+                                cursor="pointer"
+                                _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
+                                transition="all 0.2s"
+                                onClick={() => navigate(`/modules/${module.id}`)}
+                              >
+                                <Flex direction={{ base: 'column', md: 'row' }} gap={4} align="center">
+                                  <VStack align="start" spacing={2} flex="1">
+                                    <Text fontSize="sm" opacity={0.8}>
+                                      {module.category}
+                                    </Text>
+                                    <Heading size="md" fontWeight="bold">
+                                      {module.title}
+                                    </Heading>
+                                    <Text fontSize="sm" opacity={0.7} noOfLines={2}>
+                                      {module.description}
+                                    </Text>
+                                  </VStack>
+                                  <Box>
+                                    <Text fontSize="sm" opacity={0.8} mb={2}>
+                                      {module.timeRemaining}
+                                    </Text>
+                                    <Button
+                                      leftIcon={<FaPlay />}
+                                      bg={greenColor}
+                                      color="white"
+                                      _hover={{ bg: '#00C96E' }}
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        navigate(`/modules/${module.id}`)
+                                      }}
+                                    >
+                                      Commencer
+                                    </Button>
+                                  </Box>
+                                </Flex>
+                              </Box>
+                            ))}
+                          </VStack>
+                        </Box>
+                      )}
+                    </>
+                  )}
                 </VStack>
               </Box>
 

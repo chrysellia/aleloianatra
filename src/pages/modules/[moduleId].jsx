@@ -29,68 +29,210 @@ import {
   Flex,
   Spacer,
   IconButton,
+  Spinner,
+  Center,
+  Link,
 } from '@chakra-ui/react'
 import { ChevronRightIcon, ChevronLeftIcon, StarIcon, CheckCircleIcon } from '@chakra-ui/icons'
 import { FaBookOpen, FaPlay, FaLock, FaCheckCircle, FaRegClock } from 'react-icons/fa'
+import { modulesAPI } from '../../lib/api'
+import { useAuth } from '../../context/AuthContext'
+import Logo from '../../components/Logo'
 
 export default function ModuleDetail() {
   const { moduleId } = useParams()
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const [moduleData, setModuleData] = useState(null)
   const [activeTab, setActiveTab] = useState(0)
   const [loading, setLoading] = useState(true)
   const [progress, setProgress] = useState(0)
+  
+  const bgColor = useColorModeValue('white', 'gray.800')
+  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const greenColor = '#00D97E'
+  const darkBlue = '#0B1426'
+  const userName = user?.name || 'Utilisateur'
 
-  // Simuler le chargement des données
+  // Charger les données du module depuis l'API
   useEffect(() => {
-    // Ici, vous feriez normalement un appel API
-    const fetchModuleData = () => {
-      // Données de démonstration
-      // Après (corrigé)
-const mockModules = {
-  medias: {
-    id: 'medias',
-    title: 'Médias et Information',
-    description: 'Apprenez à analyser et évaluer les informations des médias de manière critique.',
-    category: 'Éducation aux médias',
-    difficulty: 'Intermédiaire',
-    duration: '4h 30min',
-    totalLessons: 8,  // Renommé de 'lessons' à 'totalLessons'
-    progress: 45,
-    instructor: {
-      name: 'Dr. Marie Rakoto',
-      role: 'Professeure en Sciences de l\'Information',
-      avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-    },
-    objectives: [
-      'Comprendre le paysage médiatique actuel',
-      'Identifier les sources fiables',
-      'Détecter les fausses informations',
-      'Développer un esprit critique face aux médias'
-    ],
-    lessons: [  // Seule déclaration de 'lessons'
-      { id: 1, title: 'Introduction aux médias', duration: '25 min', completed: true, locked: false },
-      { id: 2, title: 'Les différents types de médias', duration: '35 min', completed: true, locked: false },
-      { id: 3, title: 'Comment évaluer une source', duration: '40 min', completed: true, locked: false },
-      { id: 4, title: 'Les biais médiatiques', duration: '30 min', completed: false, locked: false },
-      { id: 5, title: 'Les fake news et comment les repérer', duration: '45 min', completed: false, locked: true },
-      { id: 6, title: 'Les réseaux sociaux et l\'information', duration: '35 min', completed: false, locked: true },
-      { id: 7, title: 'Atelier pratique', duration: '1h', completed: false, locked: true },
-      { id: 8, title: 'Évaluation finale', duration: '20 min', completed: false, locked: true },
-    ]
-  }
-}
-
-      setTimeout(() => {
-        const data = mockModules[moduleId] || null
-        setModuleData(data)
-        setProgress(data?.progress || 0)
+    const fetchModuleData = async () => {
+      try {
+        setLoading(true)
+        const response = await modulesAPI.getById(moduleId)
+        
+        if (response.success) {
+          const module = response.data
+          
+          // Récupérer les leçons
+          const lessonsResponse = await modulesAPI.getLessons(moduleId)
+          const lessons = lessonsResponse.success ? lessonsResponse.data : []
+          
+          // Formater les données pour correspondre à la structure existante
+          const formattedData = {
+            id: module.id,
+            title: module.title,
+            description: module.description,
+            category: mapLevelToCategory(module.level),
+            difficulty: mapLevelToDifficulty(module.level),
+            duration: formatDuration(module.estimatedMinutes),
+            totalLessons: lessons.length,
+            progress: module.userProgress?.progressPercent || 0,
+            instructor: {
+              name: 'Équipe Alelo\'IA-NATRA',
+              role: 'Formateurs certifiés',
+              avatar: null,
+            },
+            objectives: [
+              'Maîtriser les concepts clés du module',
+              'Appliquer les connaissances acquises',
+              'Développer une compréhension approfondie',
+              'Valider vos compétences'
+            ],
+            lessons: lessons.map((lesson, index) => {
+              // Vérifier si la leçon est complétée (basé sur le progress de l'utilisateur)
+              const isCompleted = module.userProgress?.progressPercent === 100 || 
+                                 (index < Math.floor((module.userProgress?.progressPercent || 0) / (100 / lessons.length)))
+              const isLocked = index > 0 && !lessons[index - 1]?.completed && !isCompleted
+              
+              return {
+                id: lesson.id,
+                title: lesson.title,
+                duration: '30 min', // Durée par défaut, peut être calculée si disponible
+                completed: isCompleted,
+                locked: isLocked,
+              }
+            })
+          }
+          
+          setModuleData(formattedData)
+          setProgress(formattedData.progress)
+        } else {
+          // Si le module n'est pas trouvé dans l'API, utiliser les données mockées pour les anciens modules
+          const mockModules = {
+            medias: {
+              id: 'medias',
+              title: 'Médias et Information',
+              description: 'Apprenez à analyser et évaluer les informations des médias de manière critique.',
+              category: 'Éducation aux médias',
+              difficulty: 'Intermédiaire',
+              duration: '4h 30min',
+              totalLessons: 8,
+              progress: 45,
+              instructor: {
+                name: 'Dr. Marie Rakoto',
+                role: 'Professeure en Sciences de l\'Information',
+                avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+              },
+              objectives: [
+                'Comprendre le paysage médiatique actuel',
+                'Identifier les sources fiables',
+                'Détecter les fausses informations',
+                'Développer un esprit critique face aux médias'
+              ],
+              lessons: [
+                { id: 1, title: 'Introduction aux médias', duration: '25 min', completed: true, locked: false },
+                { id: 2, title: 'Les différents types de médias', duration: '35 min', completed: true, locked: false },
+                { id: 3, title: 'Comment évaluer une source', duration: '40 min', completed: true, locked: false },
+                { id: 4, title: 'Les biais médiatiques', duration: '30 min', completed: false, locked: false },
+                { id: 5, title: 'Les fake news et comment les repérer', duration: '45 min', completed: false, locked: true },
+                { id: 6, title: 'Les réseaux sociaux et l\'information', duration: '35 min', completed: false, locked: true },
+                { id: 7, title: 'Atelier pratique', duration: '1h', completed: false, locked: true },
+                { id: 8, title: 'Évaluation finale', duration: '20 min', completed: false, locked: true },
+              ]
+            }
+          }
+          
+          const mockData = mockModules[moduleId]
+          if (mockData) {
+            setModuleData(mockData)
+            setProgress(mockData.progress)
+          } else {
+            setModuleData(null)
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement du module:', error)
+        // En cas d'erreur, essayer les données mockées
+        const mockModules = {
+          medias: {
+            id: 'medias',
+            title: 'Médias et Information',
+            description: 'Apprenez à analyser et évaluer les informations des médias de manière critique.',
+            category: 'Éducation aux médias',
+            difficulty: 'Intermédiaire',
+            duration: '4h 30min',
+            totalLessons: 8,
+            progress: 45,
+            instructor: {
+              name: 'Dr. Marie Rakoto',
+              role: 'Professeure en Sciences de l\'Information',
+              avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+            },
+            objectives: [
+              'Comprendre le paysage médiatique actuel',
+              'Identifier les sources fiables',
+              'Détecter les fausses informations',
+              'Développer un esprit critique face aux médias'
+            ],
+            lessons: [
+              { id: 1, title: 'Introduction aux médias', duration: '25 min', completed: true, locked: false },
+              { id: 2, title: 'Les différents types de médias', duration: '35 min', completed: true, locked: false },
+              { id: 3, title: 'Comment évaluer une source', duration: '40 min', completed: true, locked: false },
+              { id: 4, title: 'Les biais médiatiques', duration: '30 min', completed: false, locked: false },
+              { id: 5, title: 'Les fake news et comment les repérer', duration: '45 min', completed: false, locked: true },
+              { id: 6, title: 'Les réseaux sociaux et l\'information', duration: '35 min', completed: false, locked: true },
+              { id: 7, title: 'Atelier pratique', duration: '1h', completed: false, locked: true },
+              { id: 8, title: 'Évaluation finale', duration: '20 min', completed: false, locked: true },
+            ]
+          }
+        }
+        
+        const mockData = mockModules[moduleId]
+        if (mockData) {
+          setModuleData(mockData)
+          setProgress(mockData.progress)
+        } else {
+          setModuleData(null)
+        }
+      } finally {
         setLoading(false)
-      }, 500)
+      }
     }
 
     fetchModuleData()
   }, [moduleId])
+
+  // Fonctions utilitaires
+  const mapLevelToCategory = (level) => {
+    const map = {
+      'BEGINNER': 'Débutant',
+      'INTERMEDIATE': 'Intermédiaire',
+      'ADVANCED': 'Avancé',
+      'PRACTICAL': 'Pratique'
+    }
+    return map[level] || level
+  }
+
+  const mapLevelToDifficulty = (level) => {
+    const map = {
+      'BEGINNER': 'Débutant',
+      'INTERMEDIATE': 'Intermédiaire',
+      'ADVANCED': 'Avancé',
+      'PRACTICAL': 'Pratique'
+    }
+    return map[level] || level
+  }
+
+  const formatDuration = (minutes) => {
+    if (!minutes) return 'Non spécifié'
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    if (hours > 0) {
+      return `${hours}h ${mins}min`
+    }
+    return `${mins}min`
+  }
 
   const handleLessonClick = (lesson) => {
     if (lesson.locked) return
@@ -113,21 +255,116 @@ const mockModules = {
 
   if (loading) {
     return (
-      <Container maxW="7xl" py={8}>
-        <Text>Chargement du module...</Text>
-      </Container>
+      <Box bg={useColorModeValue('gray.50', 'gray.900')} minH="100vh">
+        {/* Header Navigation */}
+        <Box bg={bgColor} borderBottom="1px" borderColor={borderColor} position="sticky" top={0} zIndex={100}>
+          <Flex h={16} alignItems="center" justifyContent="space-between" px={{ base: 4, md: 8, lg: 12 }}>
+            <HStack spacing={8}>
+              <Logo size="sm" />
+              <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
+                <Link 
+                  as={RouterLink} 
+                  to="/dashboard" 
+                  fontWeight="medium" 
+                  color={darkBlue}
+                  _hover={{ color: greenColor }}
+                >
+                  Accueil
+                </Link>
+                <Link 
+                  as={RouterLink} 
+                  to="/modules" 
+                  fontWeight="semibold" 
+                  color={darkBlue}
+                  bg="gray.100"
+                  px={3}
+                  py={1}
+                  borderRadius="md"
+                  _hover={{ bg: 'gray.200' }}
+                >
+                  Apprendre
+                </Link>
+              </HStack>
+            </HStack>
+            <HStack spacing={4}>
+              <Avatar size="sm" name={userName} bg={greenColor} />
+              <Button
+                size="sm"
+                variant="outline"
+                colorScheme="red"
+                onClick={logout}
+              >
+                Se déconnecter
+              </Button>
+            </HStack>
+          </Flex>
+        </Box>
+        <Container maxW="7xl" py={8}>
+          <Center py={12}>
+            <VStack spacing={4}>
+              <Spinner size="xl" color="blue.500" thickness="4px" />
+              <Text>Chargement du module...</Text>
+            </VStack>
+          </Center>
+        </Container>
+      </Box>
     )
   }
 
+  // Ne pas afficher "Module non trouvé" - garder les anciennes pages mockées
   if (!moduleData) {
+    // Retourner null ou rediriger silencieusement vers la liste des modules
     return (
-      <Container maxW="7xl" py={8} textAlign="center">
-        <Heading size="lg" mb={4}>Module non trouvé</Heading>
-        <Text mb={6}>Le module que vous recherchez n'existe pas ou a été déplacé.</Text>
-        <Button as={RouterLink} to="/modules" colorScheme="primary">
-          Retour aux modules
-        </Button>
-      </Container>
+      <Box bg={useColorModeValue('gray.50', 'gray.900')} minH="100vh">
+        {/* Header Navigation */}
+        <Box bg={bgColor} borderBottom="1px" borderColor={borderColor} position="sticky" top={0} zIndex={100}>
+          <Flex h={16} alignItems="center" justifyContent="space-between" px={{ base: 4, md: 8, lg: 12 }}>
+            <HStack spacing={8}>
+              <Logo size="sm" />
+              <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
+                <Link 
+                  as={RouterLink} 
+                  to="/dashboard" 
+                  fontWeight="medium" 
+                  color={darkBlue}
+                  _hover={{ color: greenColor }}
+                >
+                  Accueil
+                </Link>
+                <Link 
+                  as={RouterLink} 
+                  to="/modules" 
+                  fontWeight="semibold" 
+                  color={darkBlue}
+                  bg="gray.100"
+                  px={3}
+                  py={1}
+                  borderRadius="md"
+                  _hover={{ bg: 'gray.200' }}
+                >
+                  Apprendre
+                </Link>
+              </HStack>
+            </HStack>
+            <HStack spacing={4}>
+              <Avatar size="sm" name={userName} bg={greenColor} />
+              <Button
+                size="sm"
+                variant="outline"
+                colorScheme="red"
+                onClick={logout}
+              >
+                Se déconnecter
+              </Button>
+            </HStack>
+          </Flex>
+        </Box>
+        <Container maxW="7xl" py={8}>
+          <Button as={RouterLink} to="/modules" colorScheme="primary" mb={4}>
+            ← Retour aux modules
+          </Button>
+        </Container>
+      </Box>
     )
   }
 
@@ -135,7 +372,52 @@ const mockModules = {
   const completedLessons = moduleData.lessons.filter(lesson => lesson.completed).length
 
   return (
-    <Container maxW="7xl" py={8}>
+    <Box bg={useColorModeValue('gray.50', 'gray.900')} minH="100vh">
+      {/* Header Navigation */}
+      <Box bg={bgColor} borderBottom="1px" borderColor={borderColor} position="sticky" top={0} zIndex={100}>
+        <Flex h={16} alignItems="center" justifyContent="space-between" px={{ base: 4, md: 8, lg: 12 }}>
+          <HStack spacing={8}>
+            <Logo size="sm" />
+            <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
+              <Link 
+                as={RouterLink} 
+                to="/dashboard" 
+                fontWeight="medium" 
+                color={darkBlue}
+                _hover={{ color: greenColor }}
+              >
+                Accueil
+              </Link>
+              <Link 
+                as={RouterLink} 
+                to="/modules" 
+                fontWeight="semibold" 
+                color={darkBlue}
+                bg="gray.100"
+                px={3}
+                py={1}
+                borderRadius="md"
+                _hover={{ bg: 'gray.200' }}
+              >
+                Apprendre
+              </Link>
+            </HStack>
+          </HStack>
+          <HStack spacing={4}>
+            <Avatar size="sm" name={userName} bg={greenColor} />
+            <Button
+              size="sm"
+              variant="outline"
+              colorScheme="red"
+              onClick={logout}
+            >
+              Se déconnecter
+            </Button>
+          </HStack>
+        </Flex>
+      </Box>
+
+      <Container maxW="7xl" py={8}>
       {/* Fil d'Ariane */}
       <Breadcrumb spacing={2} mb={6} separator={<ChevronRightIcon color="gray.500" />}>
         <BreadcrumbItem>
@@ -376,6 +658,7 @@ const mockModules = {
           </TabPanels>
         </Tabs>
       </VStack>
-    </Container>
+      </Container>
+    </Box>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, Link as RouterLink } from 'react-router-dom'
 import {
   Box,
@@ -18,11 +18,14 @@ import {
   Select,
   Avatar,
   Link,
+  Spinner,
+  Center,
 } from '@chakra-ui/react'
 import { SearchIcon } from '@chakra-ui/icons'
-import { FaGlobeAfrica, FaNewspaper, FaBrain, FaShieldAlt, FaUsers } from 'react-icons/fa'
+import { FaGlobeAfrica, FaNewspaper, FaBrain, FaShieldAlt, FaUsers, FaBook } from 'react-icons/fa'
 import { useAuth } from '../../context/AuthContext'
 import Logo from '../../components/Logo'
+import { modulesAPI } from '../../lib/api'
 
 export default function Modules() {
   const navigate = useNavigate()
@@ -37,48 +40,83 @@ export default function Modules() {
   
   const userName = user?.name || 'Utilisateur'
 
-  const categories = [
-    {
-      id: 'medias',
-      title: 'Médias et Information',
-      description: 'Apprenez à analyser et évaluer les informations des médias',
-      icon: FaNewspaper,
-      color: 'blue',
-      modules: 8,
-    },
-    {
-      id: 'critical-thinking',
-      title: 'Pensée Critique',
-      description: 'Développez votre esprit critique et votre raisonnement',
-      icon: FaBrain,
-      color: 'purple',
-      modules: 6,
-    },
-    {
-      id: 'digital-literacy',
-      title: 'Littératie Numérique',
-      description: 'Maîtrisez les compétences numériques essentielles',
-      icon: FaGlobeAfrica,
-      color: 'green',
-      modules: 5,
-    },
-    {
-      id: 'online-safety',
-      title: 'Sécurité en Ligne',
-      description: 'Protégez-vous et vos données sur internet',
-      icon: FaShieldAlt,
-      color: 'red',
-      modules: 4,
-    },
-    {
-      id: 'social-media',
-      title: 'Réseaux Sociaux',
-      description: 'Comprenez et utilisez les réseaux sociaux de manière critique',
-      icon: FaUsers,
-      color: 'pink',
-      modules: 7,
-    },
-  ]
+  // États pour les modules
+  const [modules, setModules] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [levelFilter, setLevelFilter] = useState('all')
+
+  // Mapping des icônes et couleurs par mot-clé dans le titre
+  const getModuleMetadata = (module) => {
+    const titleLower = module.title.toLowerCase()
+    
+    // Déterminer l'icône et la couleur basés sur le titre
+    if (titleLower.includes('média') || titleLower.includes('information') || titleLower.includes('fake news') || titleLower.includes('vérification')) {
+      return { icon: FaNewspaper, color: 'blue' }
+    }
+    if (titleLower.includes('pensée') || titleLower.includes('critique') || titleLower.includes('raisonnement')) {
+      return { icon: FaBrain, color: 'purple' }
+    }
+    if (titleLower.includes('numérique') || titleLower.includes('digital') || titleLower.includes('littératie')) {
+      return { icon: FaGlobeAfrica, color: 'green' }
+    }
+    if (titleLower.includes('sécurité') || titleLower.includes('protection') || titleLower.includes('sécuriser')) {
+      return { icon: FaShieldAlt, color: 'red' }
+    }
+    if (titleLower.includes('réseau') || titleLower.includes('social') || titleLower.includes('communauté')) {
+      return { icon: FaUsers, color: 'pink' }
+    }
+    if (titleLower.includes('finance') || titleLower.includes('financier') || titleLower.includes('budget') || titleLower.includes('épargne')) {
+      return { icon: FaBook, color: 'teal' }
+    }
+    
+    // Par défaut
+    return { icon: FaBook, color: 'gray' }
+  }
+
+  // Charger les modules depuis l'API
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        setLoading(true)
+        const params = {}
+        if (levelFilter !== 'all') {
+          params.level = levelFilter.toUpperCase()
+        }
+        
+        const response = await modulesAPI.getAll(params)
+        if (response.success) {
+          // Mapper les modules avec les métadonnées (icône, couleur, etc.)
+          const mappedModules = response.data.map(module => {
+            const metadata = getModuleMetadata(module)
+            return {
+              ...module,
+              icon: metadata.icon,
+              color: metadata.color,
+              moduleCount: module._count?.lessons || 0,
+            }
+          })
+          setModules(mappedModules)
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des modules:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchModules()
+  }, [levelFilter])
+
+  // Filtrer les modules par recherche
+  const filteredModules = modules.filter(module => {
+    if (!searchQuery) return true
+    const query = searchQuery.toLowerCase()
+    return (
+      module.title.toLowerCase().includes(query) ||
+      module.description.toLowerCase().includes(query)
+    )
+  })
 
   const difficultyLevels = [
     { value: 'all', label: 'Tous les niveaux' },
@@ -87,8 +125,8 @@ export default function Modules() {
     { value: 'advanced', label: 'Avancé' },
   ]
 
-  const handleCategoryClick = (categoryId) => {
-    navigate(`/modules/${categoryId}`)
+  const handleModuleClick = (moduleId) => {
+    navigate(`/modules/${moduleId}`)
   }
 
   return (
@@ -166,6 +204,8 @@ export default function Modules() {
                 <Input
                   placeholder="Rechercher un module..."
                   size="lg"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   _focus={{
                     borderColor: 'primary.500',
                     boxShadow: '0 0 0 1px var(--chakra-colors-primary-500)',
@@ -176,6 +216,8 @@ export default function Modules() {
               <Select
                 placeholder="Filtrer par niveau"
                 size="lg"
+                value={levelFilter}
+                onChange={(e) => setLevelFilter(e.target.value)}
                 _focus={{
                   borderColor: 'primary.500',
                   boxShadow: '0 0 0 1px var(--chakra-colors-primary-500)',
@@ -190,78 +232,109 @@ export default function Modules() {
             </SimpleGrid>
           </Box>
 
-          {/* Liste des catégories */}
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-            {categories.map((category) => (
-              <Box
-                key={category.id}
-                bg={cardBg}
-                p={6}
-                borderRadius="lg"
-                boxShadow="md"
-                borderWidth="1px"
-                borderColor={borderColor}
-                _hover={{
-                  transform: 'translateY(-4px)',
-                  boxShadow: 'lg',
-                  cursor: 'pointer',
-                }}
-                transition="all 0.2s"
-                onClick={() => handleCategoryClick(category.id)}
-              >
-                <VStack spacing={4} align="stretch">
-                  <HStack spacing={4}>
-                    <Box
-                      p={3}
-                      bg={`${category.color}.100`}
-                      color={`${category.color}.600`}
-                      borderRadius="lg"
-                    >
-                      <Icon as={category.icon} boxSize={6} />
-                    </Box>
-                    <Box>
-                      <Heading as="h3" size="md">
-                        {category.title}
-                      </Heading>
-                      <Badge colorScheme={category.color} variant="subtle" mt={1}>
-                        {category.modules} MODULES
-                      </Badge>
-                    </Box>
-                  </HStack>
-                  <Text color={textSecondary} noOfLines={2}>
-                    {category.description}
-                  </Text>
-                  <Flex justify="space-between" align="center" pt={2}>
-                    <HStack spacing={2}>
-                      {[1, 2, 3].map((star) => (
+          {/* Liste des modules */}
+          {loading ? (
+            <Center py={12}>
+              <VStack spacing={4}>
+                <Spinner size="xl" color={greenColor} thickness="4px" />
+                <Text color={textSecondary}>Chargement des modules...</Text>
+              </VStack>
+            </Center>
+          ) : filteredModules.length === 0 ? (
+            <Box
+              bg={cardBg}
+              p={8}
+              borderRadius="lg"
+              textAlign="center"
+              borderWidth="1px"
+              borderColor={borderColor}
+            >
+              <Text color={textSecondary} fontSize="lg">
+                {searchQuery || levelFilter !== 'all'
+                  ? 'Aucun module ne correspond à vos critères de recherche'
+                  : 'Aucun module disponible pour le moment'}
+              </Text>
+            </Box>
+          ) : (
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+              {filteredModules.map((module) => {
+                const levelMap = {
+                  BEGINNER: 'Débutant',
+                  INTERMEDIATE: 'Intermédiaire',
+                  ADVANCED: 'Avancé',
+                  PRACTICAL: 'Pratique'
+                }
+                
+                return (
+                  <Box
+                    key={module.id}
+                    bg={cardBg}
+                    p={6}
+                    borderRadius="lg"
+                    boxShadow="md"
+                    borderWidth="1px"
+                    borderColor={borderColor}
+                    _hover={{
+                      transform: 'translateY(-4px)',
+                      boxShadow: 'lg',
+                      cursor: 'pointer',
+                    }}
+                    transition="all 0.2s"
+                    onClick={() => handleModuleClick(module.id)}
+                  >
+                    <VStack spacing={4} align="stretch">
+                      <HStack spacing={4}>
                         <Box
-                          key={star}
-                          w={3}
-                          h={3}
-                          borderRadius="full"
-                          bg={star <= 3 ? 'yellow.400' : 'gray.200'}
-                        />
-                      ))}
-                      <Text fontSize="sm" color={textSecondary}>
-                        (24 avis)
+                          p={3}
+                          bg={`${module.color}.100`}
+                          color={`${module.color}.600`}
+                          borderRadius="lg"
+                        >
+                          <Icon as={module.icon} boxSize={6} />
+                        </Box>
+                        <Box flex="1">
+                          <Heading as="h3" size="md">
+                            {module.title}
+                          </Heading>
+                          <Badge colorScheme={module.color} variant="subtle" mt={1}>
+                            {module.moduleCount} {module.moduleCount === 1 ? 'LEÇON' : 'LEÇONS'}
+                          </Badge>
+                        </Box>
+                      </HStack>
+                      <Text color={textSecondary} noOfLines={2}>
+                        {module.description}
                       </Text>
-                    </HStack>
-                    <Button
-                      size="sm"
-                      colorScheme={category.color}
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleCategoryClick(category.id)
-                      }}
-                    >
-                      Voir
-                    </Button>
-                  </Flex>
-                </VStack>
-              </Box>
-            ))}
-          </SimpleGrid>
+                      <Flex justify="space-between" align="center" pt={2}>
+                        <HStack spacing={2}>
+                          <Badge colorScheme="gray" variant="outline" fontSize="xs">
+                            {levelMap[module.level] || module.level}
+                          </Badge>
+                          {module.estimatedMinutes && (
+                            <Text fontSize="xs" color={textSecondary}>
+                              {Math.floor(module.estimatedMinutes / 60) > 0
+                                ? `${Math.floor(module.estimatedMinutes / 60)}h ${module.estimatedMinutes % 60}min`
+                                : `${module.estimatedMinutes}min`}
+                            </Text>
+                          )}
+                        </HStack>
+                        <Button
+                          size="sm"
+                          colorScheme={module.color}
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleModuleClick(module.id)
+                          }}
+                        >
+                          Voir
+                        </Button>
+                      </Flex>
+                    </VStack>
+                  </Box>
+                )
+              })}
+            </SimpleGrid>
+          )}
 
           {/* Appel à l'action */}
           <Box
