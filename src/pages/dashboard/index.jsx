@@ -250,10 +250,40 @@ export default function Dashboard() {
 
   // Les achievements sont maintenant chargés depuis l'API (voir useEffect ci-dessus)
 
+  // Certificats statiques basés sur les modules disponibles
   const certifications = [
-    { id: 1, title: "Data Engineer", locked: true },
-    { id: 2, title: "AI Engineer pour Dév...", locked: true },
-    { id: 3, title: "Python Data Associate", locked: true },
+    { 
+      id: 'cert-media-literacy', 
+      title: "Littératie Médiatique Certifié", 
+      description: "Vérification des informations et lutte contre les fake news",
+      moduleIds: ['module-info-verification', 'module-fake-news'],
+      locked: true,
+      icon: '📜'
+    },
+    { 
+      id: 'cert-financial-literacy', 
+      title: "Éducation Financière Certifié", 
+      description: "Intelligence financière et gestion de patrimoine",
+      moduleIds: ['module-education-financiere'],
+      locked: true,
+      icon: '💰'
+    },
+    { 
+      id: 'cert-cybersecurity', 
+      title: "Cybersécurité et Protection des Données", 
+      description: "Sécurité numérique et protection de la vie privée",
+      moduleIds: ['module-cybersecurite'],
+      locked: true,
+      icon: '🔒'
+    },
+    { 
+      id: 'cert-digital-citizenship', 
+      title: "Citoyenneté Numérique", 
+      description: "Éthique numérique et responsabilité en ligne",
+      moduleIds: ['module-citoyennete-numerique'],
+      locked: true,
+      icon: '🌐'
+    }
   ]
 
   const userInitial = user?.name?.charAt(0).toUpperCase() || 'U'
@@ -602,10 +632,11 @@ export default function Dashboard() {
                       borderStyle="dashed"
                     >
                       <VStack spacing={1}>
-                        <Text fontSize="xs" fontWeight="bold" color={textSecondary}>
-                          DATA SCIENTIST
+                        <Text fontSize="2xl">{certifications[0]?.icon || '📜'}</Text>
+                        <Text fontSize="xs" fontWeight="bold" color={textSecondary} textAlign="center" px={2}>
+                          {certifications[0]?.title?.toUpperCase().substring(0, 20) || 'CERTIFICAT'}
                         </Text>
-                        <Icon as={FaLock} color={textSecondary} boxSize={6} />
+                        <Icon as={FaLock} color={textSecondary} boxSize={4} />
                       </VStack>
                     </Box>
 
@@ -622,7 +653,7 @@ export default function Dashboard() {
                       
                       {/* Certification Tags */}
                       <HStack spacing={3} flexWrap="wrap">
-                        {certifications.map((cert) => (
+                        {certifications.slice(0, 3).map((cert) => (
                           <HStack
                             key={cert.id}
                             bg={useColorModeValue('gray.50', 'gray.600')}
@@ -632,9 +663,13 @@ export default function Dashboard() {
                             borderWidth="1px"
                             borderColor={borderColor}
                             spacing={2}
+                            cursor="pointer"
+                            _hover={{ bg: useColorModeValue('gray.100', 'gray.500') }}
+                            transition="all 0.2s"
                           >
+                            <Text fontSize="sm">{cert.icon}</Text>
                             <Icon as={FaLock} color={textSecondary} boxSize={3} />
-                            <Text fontSize="sm" color={darkBlue} fontWeight="medium">
+                            <Text fontSize="sm" color={darkBlue} fontWeight="medium" maxW="150px" isTruncated>
                               {cert.title}
                             </Text>
                           </HStack>

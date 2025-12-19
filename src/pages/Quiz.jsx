@@ -23,7 +23,7 @@ import {
   Badge,
 } from '@chakra-ui/react'
 import { FaArrowLeft, FaCheck, FaTimes, FaBook } from 'react-icons/fa'
-import { modulesAPI, quizzesAPI, internalAPI } from '../lib/api'
+import { modulesAPI, quizzesAPI, internalAPI, progressAPI } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import AICoach from '../components/AICoach'
 import Logo from '../components/Logo'
@@ -226,17 +226,28 @@ const Quiz = () => {
     }
   }
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     setIsAnswerSubmitted(false)
     setLastAnswerResult(null)
     setLastError(null)
     setSelectedIndex(null)
     
-    // Passer à la question suivante ou afficher les résultats
+    // Passer à la question suivante ou rediriger vers le certificat
     if (currentQuestion < quizData.length - 1) {
       setCurrentQuestion(currentQuestion + 1)
     } else {
-      setShowResult(true)
+      // Quiz terminé : marquer le module comme complété puis rediriger vers le certificat
+      try {
+        // Marquer le module comme complété à 100%
+        await progressAPI.update(moduleId, { progressPercent: 100 })
+        
+        // Rediriger vers la page de certificat
+        navigate(`/course-complete/${moduleId}`)
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour de la progression:', error)
+        // Rediriger quand même vers le certificat même en cas d'erreur
+        navigate(`/course-complete/${moduleId}`)
+      }
     }
   }
 
@@ -372,94 +383,8 @@ const Quiz = () => {
     )
   }
 
-  if (showResult) {
-    return (
-      <Box bg={bgColor} minH="100vh" display="flex" flexDirection="column">
-        {/* Header Navigation */}
-        <Box bg={headerBg} borderBottom="1px" borderColor={borderColor} position="sticky" top={0} zIndex={100}>
-          <Flex h={16} alignItems="center" justifyContent="space-between" px={{ base: 4, md: 8, lg: 12 }}>
-            <HStack spacing={8}>
-              <Logo size="sm" />
-              <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
-                <Link 
-                  as={RouterLink} 
-                  to="/dashboard" 
-                  fontWeight="medium" 
-                  color={darkBlue}
-                  _hover={{ color: greenColor }}
-                >
-                  Accueil
-                </Link>
-                <Link 
-                  as={RouterLink} 
-                  to="/modules" 
-                  fontWeight="semibold" 
-                  color={darkBlue}
-                  bg="gray.100"
-                  px={3}
-                  py={1}
-                  borderRadius="md"
-                  _hover={{ bg: 'gray.200' }}
-                >
-                  Apprendre
-                </Link>
-              </HStack>
-            </HStack>
-            <HStack spacing={4}>
-              <Avatar size="sm" name={userName} bg={greenColor} />
-              <Button
-                size="sm"
-                variant="outline"
-                colorScheme="red"
-                onClick={logout}
-              >
-                Se déconnecter
-              </Button>
-            </HStack>
-          </Flex>
-        </Box>
-        <Container maxW="container.md" py={10}>
-          <VStack spacing={6} textAlign="center">
-            <Heading as="h1" size="xl">Résultats du Quiz</Heading>
-            <Box
-              p={8}
-              bg="white"
-              borderRadius="lg"
-              boxShadow="md"
-              w="100%"
-              maxW="500px"
-            >
-              <Text fontSize="xl" mb={4}>
-                Votre score : {score} / {quizData.length}
-              </Text>
-              <Text mb={6}>
-                {score === quizData.length 
-                  ? "Félicitations ! Vous avez réussi tous les quiz !" 
-                  : score > quizData.length / 2 
-                    ? "Bon travail ! Vous pouvez encore vous améliorer." 
-                    : "Continuez à vous entraîner !"}
-              </Text>
-              <Button 
-                colorScheme="blue" 
-                onClick={handleRestart}
-                size="lg"
-                mr={2}
-              >
-                Recommencer le quiz
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => navigate(`/modules/${moduleId}`)}
-                size="lg"
-              >
-                Retour au module
-              </Button>
-            </Box>
-          </VStack>
-        </Container>
-      </Box>
-    )
-  }
+  // Le bloc showResult a été supprimé car on redirige maintenant vers le certificat
+  // if (showResult) { ... } - SUPPRIMÉ
 
   const currentQuiz = quizData[currentQuestion]
 
@@ -715,7 +640,7 @@ const Quiz = () => {
                     width="full"
                     mt={4}
                   >
-                    {currentQuestion === quizData.length - 1 ? "Voir les résultats" : "Question suivante"}
+                    {currentQuestion === quizData.length - 1 ? "Terminer le quiz" : "Question suivante"}
                   </Button>
                 )}
               </Box>
