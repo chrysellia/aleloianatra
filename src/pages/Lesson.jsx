@@ -8,7 +8,7 @@ import {
   useDisclosure, Flex, Avatar, Link
 } from '@chakra-ui/react';
 import { FaArrowLeft, FaCheck, FaClock, FaArrowRight, FaTrophy, FaLock, FaBook, FaFileAlt } from 'react-icons/fa';
-import { modulesAPI, lessonsAPI } from '../lib/api';
+import { modulesAPI, lessonsAPI, internalAPI } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import AICoach from '../components/AICoach';
 import Logo from '../components/Logo';
@@ -24,6 +24,8 @@ const Lesson = () => {
   const [isAllLessonsCompleted, setIsAllLessonsCompleted] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [showAICoach, setShowAICoach] = useState(false); // Pour mobile
+  const [recentQuizErrors, setRecentQuizErrors] = useState([]);
+  const [userProgress, setUserProgress] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   
@@ -249,6 +251,39 @@ const Lesson = () => {
     fetchLessonData();
   }, [moduleId, lessonId, navigate, toast]);
 
+  // Charger les erreurs de quiz et la progression pour le contexte AI
+  useEffect(() => {
+    const fetchAIContext = async () => {
+      if (!user?.id || !moduleId) return;
+
+      try {
+        // Récupérer les erreurs de quiz récentes
+        try {
+          const errorsResponse = await internalAPI.getUserQuizErrors(user.id, moduleId, 5);
+          if (errorsResponse.success && errorsResponse.data) {
+            setRecentQuizErrors(errorsResponse.data);
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération des erreurs de quiz:', error);
+        }
+
+        // Récupérer la progression
+        try {
+          const progressResponse = await internalAPI.getUserProgress(user.id, moduleId);
+          if (progressResponse.success && progressResponse.data) {
+            setUserProgress(progressResponse.data);
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération de la progression:', error);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement du contexte AI:', error);
+      }
+    };
+
+    fetchAIContext();
+  }, [user?.id, moduleId]);
+
   const completeLesson = useCallback(() => {
     if (!completedLessons.includes(lessonId)) {
       const updatedCompleted = [...completedLessons, lessonId];
@@ -421,6 +456,12 @@ const Lesson = () => {
             moduleTitle={moduleData.title}
             lessonTitle={currentLesson.title}
             userLevel={getUserLevel()}
+            lessonContent={currentLesson.content?.map(c => c.text).join('\n\n') || ''}
+            moduleDescription={moduleData.description || ''}
+            currentProgress={userProgress?.moduleProgress || (completedLessons.length / (moduleData.lessons.length || 1)) * 100}
+            completedLessons={completedLessons}
+            totalLessons={moduleData.lessons.length || 0}
+            recentQuizErrors={recentQuizErrors}
           />
           {/* Bouton fermer sur mobile */}
           {showAICoach && (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import {
   Box,
   VStack,
@@ -17,8 +17,25 @@ import {
   Divider,
 } from '@chakra-ui/react'
 import { FaRobot, FaPaperPlane, FaVolumeUp, FaTrash, FaFileAlt } from 'react-icons/fa'
+import { useAuth } from '../context/AuthContext'
 
-const AICoach = ({ moduleId, lessonId, moduleTitle, lessonTitle, userLevel = 'BEGINNER' }) => {
+const AICoach = forwardRef(({ 
+  moduleId, 
+  lessonId, 
+  moduleTitle, 
+  lessonTitle, 
+  userLevel = 'BEGINNER',
+  lessonContent = '',
+  moduleDescription = '',
+  currentProgress = 0,
+  completedLessons = [],
+  totalLessons = 0,
+  recentQuizErrors = [],
+  quizContext = null // Nouveau : contexte du quiz
+}, ref) => {
+  const { user } = useAuth()
+  const userId = user?.id || 'anonymous'
+  
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -31,38 +48,85 @@ const AICoach = ({ moduleId, lessonId, moduleTitle, lessonTitle, userLevel = 'BE
   const greenColor = '#03EF62'
   const darkBlue = '#03045E'
 
-  // Message de bienvenue initial
+  // Message de bienvenue initial et chargement de l'historique
   useEffect(() => {
-    const welcomeMessage = {
-      id: 'welcome',
-      type: 'ai',
-      text: `Bonjour ! Je suis votre Coach IA pour cette leçon : "${lessonTitle}". Je suis là pour vous aider à comprendre les concepts, répondre à vos questions et vous guider dans votre apprentissage. N'hésitez pas à me poser des questions !`,
-      timestamp: new Date(),
+    const fetchHistoryAndWelcome = async () => {
+      setIsInitializing(true)
+      try {
+        const historyResponse = await fetch(`http://localhost:8000/ai/history/${userId}/${lessonId}`)
+        const historyData = await historyResponse.json()
+
+        const formattedHistory = historyData.map(msg => ({
+          id: msg.id,
+          type: msg.role === 'assistant' ? 'ai' : msg.role,
+          text: msg.content,
+          timestamp: new Date(msg.timestamp),
+        }))
+        
+        if (formattedHistory.length > 0) {
+          setMessages(formattedHistory)
+        } else {
+          const welcomeMessage = {
+            id: 'welcome',
+            type: 'ai',
+            text: `Bonjour ${user?.name || ''} ! Je suis votre Coach IA pour cette leçon : "${lessonTitle}". Je suis là pour vous aider à comprendre les concepts, répondre à vos questions et vous guider dans votre apprentissage. N'hésitez pas à me poser des questions !`,
+            timestamp: new Date(),
+          }
+          setMessages([welcomeMessage])
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement de l\'historique:', error)
+        const welcomeMessage = {
+          id: 'welcome',
+          type: 'ai',
+          text: `Bonjour ${user?.name || ''} ! Je suis votre Coach IA pour cette leçon : "${lessonTitle}". Je suis là pour vous aider à comprendre les concepts, répondre à vos questions et vous guider dans votre apprentissage. N'hésitez pas à me poser des questions !`,
+          timestamp: new Date(),
+        }
+        setMessages([welcomeMessage])
+      } finally {
+        setIsInitializing(false)
+      }
     }
-    setMessages([welcomeMessage])
-    setIsInitializing(false)
-  }, [lessonTitle])
+    fetchHistoryAndWelcome()
+  }, [lessonId, lessonTitle, user?.name, userId])
 
   // Scroll vers le bas quand de nouveaux messages arrivent
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return
+  // Fonction helper pour envoyer un message avec un texte spécifique
+  const sendMessageWithText = async (messageText, hideUserMessage = false) => {
+    if (!messageText.trim() || isLoading) return
 
-    const userMessage = {
-      id: Date.now(),
-      type: 'user',
-      text: inputMessage,
-      timestamp: new Date(),
+    // Ne pas afficher le message utilisateur si hideUserMessage est true
+    if (!hideUserMessage) {
+      const userMessage = {
+        id: Date.now(),
+        type: 'user',
+        text: messageText,
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, userMessage])
     }
-
-    setMessages((prev) => [...prev, userMessage])
+    
     setInputMessage('')
     setIsLoading(true)
 
     try {
+      // Préparer le contexte enrichi
+      const enrichedContext = {
+        lessonTitle: lessonTitle,
+        lessonContent: lessonContent,
+        moduleTitle: moduleTitle,
+        moduleDescription: moduleDescription,
+        currentProgress: currentProgress,
+        completedLessons: completedLessons,
+        totalLessons: totalLessons,
+        recentQuizErrors: recentQuizErrors,
+        quizContext: quizContext
+      }
+
       // Appel à l'API du Brain (Python FastAPI)
       const response = await fetch('http://localhost:8000/ai/chat', {
         method: 'POST',
@@ -70,10 +134,12 @@ const AICoach = ({ moduleId, lessonId, moduleTitle, lessonTitle, userLevel = 'BE
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: 'current-user', // TODO: Récupérer depuis AuthContext
-          message: inputMessage,
+          user_id: userId,
+          message: messageText,
           user_level: userLevel,
           lesson_id: lessonId,
+          module_id: moduleId,
+          context: enrichedContext,
         }),
       })
 
@@ -95,7 +161,6 @@ const AICoach = ({ moduleId, lessonId, moduleTitle, lessonTitle, userLevel = 'BE
     } catch (error) {
       console.error('Erreur:', error)
       
-      // Message d'erreur avec fallback
       const errorMessage = {
         id: Date.now() + 1,
         type: 'ai',
@@ -115,6 +180,23 @@ const AICoach = ({ moduleId, lessonId, moduleTitle, lessonTitle, userLevel = 'BE
     }
   }
 
+  const sendMessage = async () => {
+    if (!inputMessage.trim() || isLoading) return
+    await sendMessageWithText(inputMessage)
+  }
+
+  // Exposer la méthode sendAutoClarification via ref
+  useImperativeHandle(ref, () => ({
+    sendAutoClarification: async (errorData) => {
+      // Construire le message automatique de clarification
+      const clarificationMessage = `J'ai fait une erreur sur cette question : "${errorData.question}". J'ai choisi "${errorData.selectedAnswer}" mais la bonne réponse est "${errorData.correctAnswer}". ${errorData.rationale ? `Explication : ${errorData.rationale}` : ''} Peux-tu m'aider à mieux comprendre ce concept ?`
+      
+      // Envoyer le message automatiquement SANS afficher le message utilisateur
+      // Cela donne l'impression que l'IA propose vraiment la solution de manière proactive
+      await sendMessageWithText(clarificationMessage, true) // true = cacher le message utilisateur
+    }
+  }))
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -122,14 +204,32 @@ const AICoach = ({ moduleId, lessonId, moduleTitle, lessonTitle, userLevel = 'BE
     }
   }
 
-  const clearChat = () => {
-    const welcomeMessage = {
-      id: 'welcome',
-      type: 'ai',
-      text: `Bonjour ! Je suis votre Coach IA pour cette leçon : "${lessonTitle}". Je suis là pour vous aider à comprendre les concepts, répondre à vos questions et vous guider dans votre apprentissage. N'hésitez pas à me poser des questions !`,
-      timestamp: new Date(),
+  const clearChat = async () => {
+    if (window.confirm('Voulez-vous vraiment effacer l\'historique de cette conversation ?')) {
+      try {
+        const response = await fetch(`http://localhost:8000/ai/history/${userId}/${lessonId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (response.ok) {
+          const welcomeMessage = {
+            id: 'welcome',
+            type: 'ai',
+            text: `Bonjour ${user?.name || ''} ! Je suis votre Coach IA pour cette leçon : "${lessonTitle}". Je suis là pour vous aider à comprendre les concepts, répondre à vos questions et vous guider dans votre apprentissage. N'hésitez pas à me poser des questions !`,
+            timestamp: new Date(),
+          }
+          setMessages([welcomeMessage])
+        } else {
+          throw new Error('Erreur lors de l\'effacement de l\'historique')
+        }
+      } catch (error) {
+        console.error('Erreur lors de l\'effacement de l\'historique:', error)
+        alert('Impossible d\'effacer l\'historique. Veuillez réessayer.')
+      }
     }
-    setMessages([welcomeMessage])
   }
 
   return (
@@ -311,7 +411,7 @@ const AICoach = ({ moduleId, lessonId, moduleTitle, lessonTitle, userLevel = 'BE
       </Box>
     </Box>
   )
-}
+})
 
 export default AICoach
 

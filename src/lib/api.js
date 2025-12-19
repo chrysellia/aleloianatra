@@ -168,6 +168,18 @@ export const progressAPI = {
 }
 
 /**
+ * API Internal (for AI Brain)
+ */
+export const internalAPI = {
+  getUserQuizErrors: async (userId, moduleId, limit = 5) => {
+    return apiRequest(`/internal/user/${userId}/quiz-errors/${moduleId}?limit=${limit}`)
+  },
+  getUserProgress: async (userId, moduleId) => {
+    return apiRequest(`/internal/user/${userId}/progress/${moduleId}`)
+  },
+}
+
+/**
  * API Analyze
  */
 export const analyzeAPI = {
