@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: aleloianatra-brain
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: BACKEND_URL
+        sync: false
+
