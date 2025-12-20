@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: aleloianatra-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: FRONTEND_URL
+        sync: false
+    buildCommand: npm ci && npx prisma generate
+    startCommand: npx prisma migrate deploy && npm start
+
