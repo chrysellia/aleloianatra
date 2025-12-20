@@ -19,6 +19,9 @@ import {
 import { FaRobot, FaPaperPlane, FaVolumeUp, FaTrash, FaFileAlt } from 'react-icons/fa'
 import { useAuth } from '../context/AuthContext'
 
+// URL du service Brain (IA)
+const BRAIN_URL = import.meta.env.VITE_BRAIN_URL || 'http://localhost:8000'
+
 const AICoach = forwardRef(({ 
   moduleId, 
   lessonId, 
@@ -53,7 +56,7 @@ const AICoach = forwardRef(({
     const fetchHistoryAndWelcome = async () => {
       setIsInitializing(true)
       try {
-        const historyResponse = await fetch(`http://localhost:8000/ai/history/${userId}/${lessonId}`)
+        const historyResponse = await fetch(`${BRAIN_URL}/ai/history/${userId}/${lessonId}`)
         const historyData = await historyResponse.json()
 
         const formattedHistory = historyData.map(msg => ({
@@ -128,7 +131,7 @@ const AICoach = forwardRef(({
       }
 
       // Appel à l'API du Brain (Python FastAPI)
-      const response = await fetch('http://localhost:8000/ai/chat', {
+      const response = await fetch(`${BRAIN_URL}/ai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +210,7 @@ const AICoach = forwardRef(({
   const clearChat = async () => {
     if (window.confirm('Voulez-vous vraiment effacer l\'historique de cette conversation ?')) {
       try {
-        const response = await fetch(`http://localhost:8000/ai/history/${userId}/${lessonId}`, {
+        const response = await fetch(`${BRAIN_URL}/ai/history/${userId}/${lessonId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

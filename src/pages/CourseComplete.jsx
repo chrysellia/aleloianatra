@@ -11,6 +11,7 @@ import confetti from 'canvas-confetti'
 import jsPDF from 'jspdf'
 import Certificate from '../components/Certificate'
 import { useAuth } from '../context/AuthContext'
+import { modulesAPI } from '../lib/api'
 
 const MotionBox = motion(Box)
 
@@ -98,8 +99,7 @@ export default function CourseComplete() {
     const fetchModule = async () => {
       try {
         // Essayer l'API backend
-        const res = await fetch(`http://localhost:5000/api/modules/${moduleId}`)
-        const data = await res.json()
+        const data = await modulesAPI.getById(moduleId)
         if (data.success) {
           setModule(data.data)
         }
